@@ -1,0 +1,1711 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AnswerMe.exe</title>
+  <style>
+  :root{
+    --desktop:#ffffff;
+    --win-gray:#ffffff;
+    --win-light:#ffffff;
+    --win-dark:#111111;
+    --win-black:#111111;
+    --title:#111111;
+    --white:#ffffff;
+    --text:#111111;
+    --danger:#ef476f;
+    --ok:#06d6a0;
+    --accent:#ffcf3d;
+    --accent2:#4f8bff;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--desktop);
+    color:var(--text);
+    min-height:100vh;
+    overflow:auto;
+  }
+
+  .desktop{
+    width:100%;
+    min-height:100vh;
+    padding:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+
+  .window{
+    width:100%;
+    max-width:460px;
+    background:var(--win-gray);
+    border:3px solid var(--win-black);
+    box-shadow:none;
+    transform:translate3d(0,0,0);
+    display:flex;
+    flex-direction:column;
+  }
+
+  .content{padding:2px 4px; max-height:calc(100vh - 100px); overflow:hidden; display:flex; flex-direction:column;}
+  #screen-home{display:flex; flex-direction:column; gap:6px; flex:1;}
+  #homeFeedArea{flex:1; display:flex; flex-direction:column;}
+  .vote-bar{position:sticky; bottom:0; background:var(--win-gray); padding:6px; border-top:1px solid var(--win-dark); display:flex; gap:8px;}
+  .result-toggle{margin-left:auto; font-size:12px; cursor:pointer; color:#333;}
+  .thumb-grid{display:grid; grid-template-columns:1fr auto 1fr; gap:2px; align-items:center;}
+  .thumb-grid .vs{font-weight:700; padding:0 6px;}
+  .countdot{display:inline-flex; gap:4px; align-items:center;}
+  .countdot span{width:6px; height:6px; border-radius:50%; background:#bbb; display:inline-block;}
+  .countdot span.on{background:#222;}
+  .comment-toggle{font-size:12px; cursor:pointer; color:#333; margin:6px 0; display:inline-block;}
+
+  .window.hidden{display:none}
+
+  .titlebar{
+    background:var(--accent2);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:6px 8px;
+    font-size:12px;
+    font-weight:800;
+    user-select:none;
+  }
+  #splashWindow .titlebar{display:none;}
+  @keyframes bauhausPulse{0%{letter-spacing:2px; transform:translateY(0);}50%{letter-spacing:4px; transform:translateY(-2px);}100%{letter-spacing:2px; transform:translateY(0);}}
+
+
+  .menubar{
+    padding:6px 8px;
+    border-bottom:1px solid var(--win-dark);
+    display:flex;
+    gap:10px;
+    font-size:12px;
+    background:var(--win-gray);
+    flex-wrap:wrap;
+  }
+
+  .content{
+    padding:2px 4px;
+    max-height:calc(100vh - 100px);
+    overflow:hidden;
+  }
+
+  .statusbar{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    padding:6px 8px;
+    border-top:1px solid var(--win-dark);
+    font-size:12px;
+    background:var(--win-gray);
+  }
+
+  .panel{
+    background:#fff;
+    padding:8px;
+    margin-bottom:8px;
+    border:3px solid var(--win-black);
+    border-radius:0;
+  }
+
+  .card{
+    background:#fff;
+    padding:6px;
+    margin-bottom:8px;
+    border:3px solid var(--win-black);
+    border-radius:0;
+  }
+  .question-card .card{padding:0; margin-bottom:10px;}
+
+  .q-title{
+    font-size:16px;
+    font-weight:bold;
+    line-height:1.3;
+    margin:6px 0 6px;
+    word-break:keep-all;
+  }
+
+  .muted{color:#333; font-size:12px;}
+
+  .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .row-between{display:flex; justify-content:space-between; gap:8px; align-items:center;}
+
+  .tabs{display:flex; gap:6px; margin:6px 0 8px; flex-wrap:wrap;}
+
+  .btn{
+    appearance:none;
+    background:#fff;
+    color:#000;
+    padding:10px 12px;
+    font-size:13px;
+    min-height:36px;
+    border:3px solid var(--win-black);
+    border-radius:0;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:800;
+  }
+
+  .btn:active,
+  .btn.active{
+    background:var(--accent);
+  }
+
+  .btn:disabled{color:#666; cursor:not-allowed;}
+  .btn-primary{font-weight:bold;}
+  .btn-danger{color:var(--danger); font-weight:bold;}
+  .btn-wide{width:100%; text-align:left; display:block;}
+
+  .poll-wrap{display:flex; align-items:center; gap:8px; font-size:12px; color:#333;}
+  .poll-bar{flex:1; height:16px; background:#fff; border-top:2px solid var(--win-dark); border-left:2px solid var(--win-dark); border-right:2px solid var(--white); border-bottom:2px solid var(--white); padding:2px;}
+  .poll-fill{height:100%; background:#2e8b57; width:0%; min-width:2px; transition:width .2s linear;}
+  .poll-label{font-weight:700; min-width:30px;}
+
+  .input,.textarea{
+    width:100%;
+    background:#fff;
+    color:#000;
+    border-top:2px solid var(--win-dark);
+    border-left:2px solid var(--win-dark);
+    border-right:2px solid var(--white);
+    border-bottom:2px solid var(--white);
+    padding:10px;
+    font-family:inherit;
+    font-size:14px;
+    outline:none;
+    border-radius:8px;
+  }
+
+  .textarea{resize:none; min-height:92px;}
+  .label{display:block; margin:10px 0 6px; font-size:13px; font-weight:bold;}
+  .small{font-size:12px;}
+
+  .error{color:var(--danger); font-size:12px; margin-top:6px; white-space:pre-line;}
+  .ok{color:var(--ok); font-size:12px; margin-top:6px; white-space:pre-line;}
+
+  .hr{border-top:1px solid var(--win-dark); margin:10px 0;}
+
+  .option-btn{flex:1; margin:0; text-align:center;}
+  #voteArea{display:flex; gap:8px; margin:6px 0;}
+
+  .progress-shell{
+    width:100%;
+    height:22px;
+    background:#fff;
+    border-top:2px solid var(--win-dark);
+    border-left:2px solid var(--win-dark);
+    border-right:2px solid var(--white);
+    border-bottom:2px solid var(--white);
+    margin:6px 0;
+    display:flex;
+    gap:2px;
+    padding:3px;
+  }
+  .progress-seg{flex:1; background:#fff; border:1px solid #222;}
+  .progress-seg.on{background:#222;}
+
+  .result-line{margin:10px 0 12px;}
+
+  .result-bar-shell{
+    width:100%;
+    height:22px;
+    background:#fff;
+    border-top:2px solid var(--win-dark);
+    border-left:2px solid var(--win-dark);
+    border-right:2px solid var(--white);
+    border-bottom:2px solid var(--white);
+    overflow:hidden;
+    margin-top:4px;
+  }
+
+  .result-bar{height:100%; background:#000080;}
+
+  .badge{
+    display:inline-block;
+    padding:2px 6px;
+    background:#fff;
+    border-top:2px solid var(--win-dark);
+    border-left:2px solid var(--win-dark);
+    border-right:2px solid var(--white);
+    border-bottom:2px solid var(--white);
+    font-size:12px;
+    margin-right:6px;
+    margin-bottom:6px;
+  }
+
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+
+  .welcome-note{line-height:1.5; font-size:13px;}
+  .home-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+  .splash-img{width:100%; display:block; border-top:2px solid var(--win-dark); border-left:2px solid var(--win-dark); border-right:2px solid var(--white); border-bottom:2px solid var(--white);}
+  .consent{display:flex; gap:6px; align-items:flex-start; font-size:12px; margin-top:6px;}
+
+  .question-shell{position:relative; min-height:auto; overflow:hidden;}
+  .question-card img{aspect-ratio:1/1; object-fit:cover; width:100%; max-height:56vh;}
+  @media (max-height:760px){
+    .question-card img{max-height:36vh;}
+    .q-title{font-size:15px; margin:4px 0;}
+    .btn{min-height:30px; font-size:12px;}
+    .statusbar{display:none;}
+    .panel{padding:8px; margin-bottom:6px;}
+  }
+  @media (max-height:680px){
+    .question-card img{max-height:32vh;}
+    .q-title{font-size:14px;}
+    .tabs{margin-bottom:4px;}
+  }
+
+  .question-card{transition:transform .28s ease, opacity .28s ease;}
+  .question-card.swipe-out{transform:translateX(110%); opacity:0;}
+
+  .empty-box{
+    background:#fff;
+    padding:22px 14px;
+    text-align:center;
+    border-top:2px solid var(--win-dark);
+    border-left:2px solid var(--win-dark);
+    border-right:2px solid var(--white);
+    border-bottom:2px solid var(--white);
+    line-height:1.5;
+  }
+
+  .footer-note{margin-top:8px; font-size:12px; color:#222;}
+
+  @media (max-width:600px){
+    .desktop{padding:0;}
+    .window{max-width:100%; min-height:100vh;}
+    .content{max-height:none;}
+    .q-title{font-size:16px;}
+    .btn{min-height:30px; font-size:12px;}
+  }
+
+  @media (min-width:601px) and (max-width:1024px){
+    .window{max-width:820px;}
+    .q-title{font-size:17px;}
+    .btn{min-height:32px; font-size:13px;}
+  }
+
+  @media (min-width:1025px){
+    .window{max-width:980px;}
+  }
+  </style>
+</head>
+<body>
+<div class="desktop">
+
+  <!-- SPLASH -->
+  <section class="window" id="splashWindow">
+    <div class="titlebar" style="background: var(--accent2); padding:10px 12px;">
+      <div class="titlebar-title" style="color:#fff; font-size:20px; font-weight:800; letter-spacing:1px; white-space:nowrap;">결정장애ON YOU</div>
+    </div>
+    <div class="content" style="padding:12px 16px 14px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50vh;">
+      <div class="message" style="font-size:22px; line-height:1.2; color:#111; margin:8px 0 12px; font-family:Arial, Helvetica, sans-serif; text-align:center;">
+        <div style="font-weight:900; letter-spacing:2px; animation:bauhausPulse 1.6s ease-in-out infinite;">결정장애ON YOU</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXIT -->
+  <section class="window hidden" id="exitWindow">
+    <div class="titlebar">
+      <span>Exit</span>
+    </div>
+    <div class="content">
+      <div class="panel center">앱이 종료되었습니다.</div>
+    </div>
+    <div class="statusbar"><span>Closed</span><span>Bye</span></div>
+  </section>
+
+  <!-- WELCOME / PROFILE -->
+  <section class="window hidden" id="welcomeWindow">
+    <div class="titlebar">
+      <span>결정장애ON YOU</span>
+    </div>
+
+    <div class="content">
+      <div class="panel">
+        <div class="welcome-note" style="border:2px dashed #6a6a6a; padding:10px; background:#f7f7f7;">
+          <div style="font-weight:700; margin-bottom:6px;">WELCOME</div>
+          회원가입 없이 사용할 수 있습니다.<br>
+          기본 테스트 계정이 자동 입력되어 있습니다.<br><br>
+          <strong>테스트 닉네임: 1234</strong><br><strong>테스트 비밀번호: 1234</strong>
+        </div>
+
+        <label class="label" for="nicknameInput">닉네임</label>
+        <input id="nicknameInput" class="input" maxlength="12" value="1234" placeholder="2~12자">
+
+        <label class="label" for="genderSelect">성별</label>
+        <select id="genderSelect" class="input">
+          <option value="male">남</option>
+          <option value="female">여</option>
+        </select>
+
+        <label class="label" for="ageInput">나이</label>
+        <input id="ageInput" class="input" type="number" min="18" max="99" placeholder="나이 입력">
+
+
+        <label class="label" for="passwordInput">비밀번호</label>
+        <input id="passwordInput" class="input" type="password" maxlength="20" value="1234" placeholder="4자 이상">
+
+        <div id="profileMessage" class="error"></div>
+
+        <div class="home-actions">
+          <button class="btn btn-primary" id="saveProfileBtn">확인</button>
+          <button class="btn" id="enterTestBtn">테스트 계정으로 시작</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="statusbar">
+      <span>Ready</span>
+      <span>AnswerMe v0.1</span>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section class="window hidden" id="appWindow">
+    <div class="titlebar">
+      <span id="appTitle">결정장애ON YOU</span>
+    </div>
+
+    <div class="menubar">
+      <span data-nav="home" class="nav-link" style="cursor:pointer;">🏠 Feed</span>
+      <span data-nav="ask" class="nav-link" style="cursor:pointer;">✍️ Ask</span>
+      <span data-nav="my" class="nav-link" style="cursor:pointer;">👤 My</span>
+      <span data-nav="admin" class="nav-link" style="cursor:pointer;">🛠️ Admin</span>
+    </div>
+
+    <div class="content">
+      <!-- HOME -->
+      <div id="screen-home">
+        <div class="tabs">
+          <button class="btn active" id="sortLatestBtn">사라/마라</button>
+          <button class="btn" id="sortPopularBtn">이것/저것</button>
+          <button class="btn" id="refreshFeedBtn">새로고침</button>
+        </div>
+
+        <div class="panel">
+          <div class="row-between">
+            <div>
+              <strong id="userLabel">anonymous</strong>
+            </div>
+            <button class="btn" id="goAskBtn">질문쓰기</button>
+          </div>
+        </div>
+
+        <div id="homeFeedArea"></div>
+      </div>
+
+      <!-- ASK -->
+      <div id="screen-ask" class="hidden">
+        <div class="panel">
+          <div class="small">질문 타입을 선택하고 이미지를 올리세요.</div>
+          <div class="small">(얼굴/닉네임 등은 노출하지 마세요)</div>
+
+          <label class="label" for="questionType">질문 타입</label>
+          <select id="questionType" class="input">
+            <option value="single">사라 vs 마라</option>
+            <option value="compare">이것 vs 저것</option>
+          </select>
+
+          <label class="label" for="imageInput">이미지 업로드 (이것)</label>
+          <input id="imageInput" class="input" type="file" accept="image/*">
+
+          <div id="compareBlock" style="display:none;">
+            <label class="label" for="imageInput2">이미지 업로드 (저것)</label>
+            <input id="imageInput2" class="input" type="file" accept="image/*">
+          </div>
+
+          <label class="label" for="questionInput">캡션 (최대 60자)</label>
+          <textarea id="questionInput" class="textarea" maxlength="60" placeholder="예: 결혼식 갈 때 입을 건데 사? 말아?"></textarea>
+          <div class="small"><span id="questionCount">0</span> / 60</div>
+
+          <div id="askMessage" class="error"></div>
+
+          <div class="home-actions">
+            <button class="btn btn-primary" id="submitQuestionBtn">등록</button>
+            <button class="btn" id="resetAskBtn">초기화</button>
+            <button class="btn" id="backHomeFromAskBtn">피드로</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MY -->
+      <div id="screen-my" class="hidden">
+        <div class="panel">
+          <div><strong id="myNickLabel">1234</strong></div>
+          <div class="small">회원가입 없는 로컬 테스트 버전</div>
+          <div class="hr"></div>
+
+          <div class="row">
+            <span class="badge">내 질문 <span id="myQuestionCount">0</span></span>
+            <span class="badge">내 투표 <span id="myVoteCount">0</span></span>
+          </div>
+
+          <div class="hr"></div>
+
+          <label class="label" for="nicknameEdit">닉네임 변경 (월 1회)</label>
+          <input id="nicknameEdit" class="input" maxlength="12" placeholder="새 닉네임 (2~12자)">
+
+          <div id="myMessage" class="error"></div>
+
+          <div class="home-actions">
+            <button class="btn" id="saveProfileEditBtn">프로필 저장</button>
+            <button class="btn btn-danger" id="resetAllBtn">전체 초기화</button>
+          </div>
+        </div>
+
+        <div id="myQuestionList"></div>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="screen-admin" class="hidden">
+        <div class="panel">
+          <div class="small">신고된 글은 자동 비공개 처리됩니다.</div>
+        </div>
+        <div id="adminReportList"></div>
+      </div>
+    </div>
+
+    <div class="statusbar">
+      <span id="statusText">Ready</span>
+      <span id="questionTotalText">Questions: 0</span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const STORAGE_KEYS = {
+  profile: "answerme_profile_v1",
+  questions: "answerme_questions_v1",
+  votes: "answerme_votes_v1",
+  session: "answerme_session_v1",
+  comments: "answerme_comments_v1",
+  reports: "answerme_reports_v1",
+  banned: "answerme_banned_v1",
+  shuffled: "answerme_shuffled_v1",
+  cleared: "answerme_cleared_v1",
+  clearedCompare: "answerme_cleared_compare_v1"
+};
+
+
+const TEST_PROFILE = { nickname: "1234", gender: "male", age: 24, region: "Seoul", password: "1234", lastNickChangeAt: 0 };
+
+const bannedWords = [
+  "씨발","시발","병신","좆","존나","개새끼","새끼","미친놈","미친년","꺼져","썅","시발놈",
+  "섹스","성교","자위","보지","자지","유두","가슴만져","애무","오르가즘","딸딸이","야동",
+  "강간","성폭행","몰카","음란","창녀","걸레","난교","정액","사정","성노예",
+  "ㅅㅂ","ㅂㅅ","ㅈㄴ","ㅅㅅ","ㅈㅈ","ㅂㅈ","ㅈㅅ",
+  "정치","대통령","국회","국회의원","정당","선거","투표","국힘","민주당","진보","보수"
+];
+
+const maskWords = [
+  "씨발","시발","병신","좆","존나","개새끼","새끼","미친놈","미친년","꺼져","썅",
+  "섹스","성교","자위","보지","자지","야동","강간","성폭행","음란","창녀","걸레"
+];
+
+const defaultQuestions = [
+  // 사라/마라 예시 10
+  { id: makeId(), type: "single", q: "결혼식 갈 때 입을 건데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2f2f2'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23d9d9d9'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM A</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 100000 },
+  { id: makeId(), type: "single", q: "출근룩으로 무난한데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f7f7f7'/><circle cx='300' cy='360' r='180' fill='%23e0e0e0'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM B</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 99000 },
+  { id: makeId(), type: "single", q: "가격 대비 괜찮아 보이는데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f3f3f3'/><rect x='140' y='160' width='320' height='480' rx='18' fill='%23e6e6e6'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM C</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 98000 },
+  { id: makeId(), type: "single", q: "색감이 튀는데 오히려 괜찮을까? 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f9f1f1'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23f5c2c2'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM D</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 97000 },
+  { id: makeId(), type: "single", q: "나한테 어울릴지 애매한데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2f6ff'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23cfe0ff'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM E</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 96000 },
+  { id: makeId(), type: "single", q: "시즌 끝나기 전에 지를까? 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f6f2ff'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23e2d6ff'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM F</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 95000 },
+  { id: makeId(), type: "single", q: "후기 반반인데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2fff6'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23d6ffe4'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM G</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 94000 },
+  { id: makeId(), type: "single", q: "유행템이라 고민돼. 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23fff7f0'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23ffd8b5'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM H</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 93000 },
+  { id: makeId(), type: "single", q: "할인 크게 했는데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f3f3f3'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23e8e8e8'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM I</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 92000 },
+  { id: makeId(), type: "single", q: "대체품이 없어서 고민돼. 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f9f9f9'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23dedede'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM J</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 91000 },
+
+
+];
+
+
+let currentProfile = null;
+let questions = [];
+let votes = {};
+let comments = {};
+let reports = {};
+let bannedUsers = {};
+let session = { sort: "latest", currentQueue: [], currentIndex: 0 };
+
+let activeQuestionId = null;
+let countdownTimer = null;
+let countdownValue = 6;
+let canVote = false;
+
+const splashWindow = document.getElementById("splashWindow");
+const exitWindow = document.getElementById("exitWindow");
+const welcomeWindow = document.getElementById("welcomeWindow");
+const appWindow = document.getElementById("appWindow");
+const nicknameInput = document.getElementById("nicknameInput");
+const genderSelect = document.getElementById("genderSelect");
+const ageInput = document.getElementById("ageInput");
+const passwordInput = document.getElementById("passwordInput");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
+const enterTestBtn = document.getElementById("enterTestBtn");
+const profileMessage = document.getElementById("profileMessage");
+
+const screens = {
+  home: document.getElementById("screen-home"),
+  ask: document.getElementById("screen-ask"),
+  my: document.getElementById("screen-my"),
+  admin: document.getElementById("screen-admin")
+};
+
+const navLinks = [...document.querySelectorAll(".nav-link")];
+const statusText = document.getElementById("statusText");
+const questionTotalText = document.getElementById("questionTotalText");
+
+const sortLatestBtn = document.getElementById("sortLatestBtn");
+const sortPopularBtn = document.getElementById("sortPopularBtn");
+const refreshFeedBtn = document.getElementById("refreshFeedBtn");
+const userLabel = document.getElementById("userLabel");
+const goAskBtn = document.getElementById("goAskBtn");
+const homeFeedArea = document.getElementById("homeFeedArea");
+
+const questionInput = document.getElementById("questionInput");
+const questionCount = document.getElementById("questionCount");
+const imageInput = document.getElementById("imageInput");
+const imageInput2 = document.getElementById("imageInput2");
+const questionType = document.getElementById("questionType");
+const compareBlock = document.getElementById("compareBlock");
+
+const submitQuestionBtn = document.getElementById("submitQuestionBtn");
+const resetAskBtn = document.getElementById("resetAskBtn");
+const backHomeFromAskBtn = document.getElementById("backHomeFromAskBtn");
+const askMessage = document.getElementById("askMessage");
+
+const myNickLabel = document.getElementById("myNickLabel");
+const myQuestionCount = document.getElementById("myQuestionCount");
+const myVoteCount = document.getElementById("myVoteCount");
+const myQuestionList = document.getElementById("myQuestionList");
+const nicknameEdit = document.getElementById("nicknameEdit");
+const saveProfileEditBtn = document.getElementById("saveProfileEditBtn");
+const resetAllBtn = document.getElementById("resetAllBtn");
+const myMessage = document.getElementById("myMessage");
+const adminReportList = document.getElementById("adminReportList");
+
+function makeId(){
+  return "q_" + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+}
+
+function loadLocal(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  }catch(e){
+    return fallback;
+  }
+}
+
+function saveLocal(key, value){
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function initData(){
+  currentProfile = loadLocal(STORAGE_KEYS.profile, TEST_PROFILE);
+  questions = loadLocal(STORAGE_KEYS.questions, defaultQuestions);
+  votes = loadLocal(STORAGE_KEYS.votes, {});
+  comments = loadLocal(STORAGE_KEYS.comments, {});
+  reports = loadLocal(STORAGE_KEYS.reports, {});
+  bannedUsers = loadLocal(STORAGE_KEYS.banned, {});
+  session = loadLocal(STORAGE_KEYS.session, {
+    sort: "latest",
+    currentQueue: [],
+    currentIndex: 0
+  });
+  session.sort = "latest";
+
+  const clearedOnce = loadLocal(STORAGE_KEYS.cleared, false);
+  if(!clearedOnce){
+    questions = [...defaultQuestions];
+    saveLocal(STORAGE_KEYS.questions, questions);
+    saveLocal(STORAGE_KEYS.cleared, true);
+  }
+
+  const clearedCompareOnce = loadLocal(STORAGE_KEYS.clearedCompare, false);
+  if(!clearedCompareOnce && Array.isArray(questions) && questions.length > 0){
+    questions = questions.filter(q => q.type !== "compare");
+    saveLocal(STORAGE_KEYS.questions, questions);
+    saveLocal(STORAGE_KEYS.clearedCompare, true);
+  }
+
+  const shuffledOnce = loadLocal(STORAGE_KEYS.shuffled, false);
+  if(!shuffledOnce && Array.isArray(questions) && questions.length > 0){
+    questions = shuffleArray(questions);
+    saveLocal(STORAGE_KEYS.questions, questions);
+    saveLocal(STORAGE_KEYS.shuffled, true);
+  }
+
+  if(!currentProfile || !currentProfile.nickname || !currentProfile.password){
+    currentProfile = {...TEST_PROFILE};
+    saveLocal(STORAGE_KEYS.profile, currentProfile);
+  }
+
+  if(!currentProfile.gender) currentProfile.gender = "male";
+  if(!currentProfile.age) currentProfile.age = 24;
+  if(!currentProfile.region) currentProfile.region = "Seoul";
+  if(!currentProfile.lastNickChangeAt) currentProfile.lastNickChangeAt = 0;
+
+  if(!Array.isArray(questions) || questions.length === 0){
+    questions = [...defaultQuestions];
+    saveLocal(STORAGE_KEYS.questions, questions);
+  }
+
+  if(typeof votes !== "object" || votes === null){
+    votes = {};
+    saveLocal(STORAGE_KEYS.votes, votes);
+  }
+
+  if(!session || !Array.isArray(session.currentQueue)){
+    session = { sort: "latest", currentQueue: [], currentIndex: 0 };
+    saveLocal(STORAGE_KEYS.session, session);
+  }
+}
+
+function boot(){
+  initData();
+  nicknameInput.value = currentProfile.nickname || "1234";
+  genderSelect.value = currentProfile.gender || "male";
+  ageInput.value = currentProfile.age || "";
+  passwordInput.value = currentProfile.password || "1234";
+
+  openSplash();
+}
+
+function openSplash(){
+  splashWindow.classList.remove("hidden");
+  welcomeWindow.classList.add("hidden");
+  appWindow.classList.add("hidden");
+  exitWindow.classList.add("hidden");
+  setTimeout(() => {
+    openApp();
+  }, 1200);
+}
+
+function openWelcome(){
+  splashWindow.classList.add("hidden");
+  exitWindow.classList.add("hidden");
+  welcomeWindow.classList.remove("hidden");
+  appWindow.classList.add("hidden");
+}
+
+function openExit(){
+  splashWindow.classList.add("hidden");
+  welcomeWindow.classList.add("hidden");
+  appWindow.classList.add("hidden");
+  exitWindow.classList.remove("hidden");
+}
+
+function openApp(){
+  splashWindow.classList.add("hidden");
+  exitWindow.classList.add("hidden");
+  welcomeWindow.classList.add("hidden");
+  appWindow.classList.remove("hidden");
+  userLabel.textContent = currentProfile.nickname;
+  myNickLabel.textContent = currentProfile.nickname;
+  session.currentIndex = 0;
+  buildQueueIfNeeded(true);
+  if(!getCurrentQuestion() && questions.length){
+    votes = {};
+    saveLocal(STORAGE_KEYS.votes, votes);
+    session.currentIndex = 0;
+    buildQueueIfNeeded(true);
+  }
+  updateCounts();
+  showScreen("home");
+  renderFeed();
+  renderMyPage();
+}
+
+function makeDraggable(win){
+  const bar = win.querySelector('.titlebar');
+  if(!bar) return;
+  let startX=0, startY=0, lastX=0, lastY=0, dragging=false;
+  const onStart = (e) => {
+    dragging = true;
+    const p = e.touches ? e.touches[0] : e;
+    startX = p.clientX; startY = p.clientY;
+    const t = win.dataset.translate ? win.dataset.translate.split(',').map(Number) : [0,0];
+    lastX = t[0]; lastY = t[1];
+  };
+  const onMove = (e) => {
+    if(!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    const dx = p.clientX - startX;
+    const dy = p.clientY - startY;
+    const nx = lastX + dx;
+    const ny = lastY + dy;
+    win.dataset.translate = `${nx},${ny}`;
+    win.style.transform = `translate(${nx}px, ${ny}px)`;
+  };
+  const onEnd = () => { dragging = false; };
+  bar.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onEnd);
+  bar.addEventListener('touchstart', onStart, {passive:true});
+  window.addEventListener('touchmove', onMove, {passive:true});
+  window.addEventListener('touchend', onEnd);
+}
+
+function showScreen(name){
+  Object.values(screens).forEach(el => el.classList.add("hidden"));
+  screens[name].classList.remove("hidden");
+  statusText.textContent = name === "home" ? "Feed" : name === "ask" ? "Ask Question" : name === "admin" ? "Admin" : "My";
+
+  if(name === "ask"){
+    const choice = prompt("질문 타입 선택\n1) 사라/마라\n2) 이것/저것");
+    const isCompare = choice === "2";
+    questionType.value = isCompare ? "compare" : "single";
+    compareBlock.style.display = isCompare ? "block" : "none";
+  }
+}
+
+function updateCounts(){
+  const totalCount = getSortedQuestions().length;
+  questionTotalText.textContent = "Questions: " + totalCount;
+  const myQuestions = questions.filter(q => q.author === currentProfile.nickname);
+  const myVotes = Object.keys(votes).length;
+  myQuestionCount.textContent = myQuestions.length;
+  myVoteCount.textContent = myVotes;
+  myNickLabel.textContent = currentProfile.nickname;
+  userLabel.textContent = currentProfile.nickname;
+}
+
+function sanitize(text){
+  return text.replace(/\s+/g, " ").trim();
+}
+
+function normalizeText(text){
+  return text.toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/[0@]/g, "o")
+    .replace(/[1!|]/g, "i")
+    .replace(/[3]/g, "e")
+    .replace(/[5\$]/g, "s")
+    .replace(/[7]/g, "t")
+    .replace(/[\._\-]/g, "");
+}
+
+function containsBannedWord(text){
+  const normalized = normalizeText(text);
+  return bannedWords.some(word => normalized.includes(word));
+}
+
+function maskText(text){
+  if(!text) return "";
+  let out = text;
+  maskWords.forEach(w => {
+    const re = new RegExp(w, "gi");
+    out = out.replace(re, "*".repeat(w.length));
+  });
+  return out;
+}
+
+function validateProfile(nick, pw, age, region){
+  if(!nick || nick.length < 2 || nick.length > 12){
+    return "닉네임은 2~12자여야 합니다.";
+  }
+  if(!pw || pw.length < 4){
+    return "비밀번호는 4자 이상이어야 합니다.";
+  }
+  if(!age || age < 18){
+    return "나이는 18세 이상이어야 합니다.";
+  }
+  if(containsBannedWord(nick)){
+    return "닉네임에 부적절한 표현이 포함되어 있습니다.";
+  }
+  return "";
+}
+
+function validateQuestion(q){
+  if(q && q.length > 60) return "캡션은 60자 이하만 가능합니다.";
+  if(q && containsBannedWord(q)){
+    return "캡션에 부적절한 표현이 포함되어 있습니다.";
+  }
+  return "";
+}
+
+function getSortedQuestions(){
+  let arr = [...questions].filter(q => !reports[q.id]);
+
+  // 최신: 사라/마라, 인기: 이거/저거
+  if(session.sort === "latest"){
+    arr = arr.filter(q => q.type !== "compare");
+  }else if(session.sort === "popular"){
+    arr = arr.filter(q => q.type === "compare");
+  }
+
+  if(session.sort === "popular"){
+    arr.sort((a,b) => (b.v1 + b.v2) - (a.v1 + a.v2));
+  }else{
+    arr.sort((a,b) => b.createdAt - a.createdAt);
+  }
+  return arr;
+}
+
+function buildQueueIfNeeded(forceReset=false){
+  const sortedIds = getSortedQuestions().map(q => q.id);
+
+  if(forceReset || session.currentQueue.length === 0){
+    session.currentQueue = sortedIds;
+    session.currentIndex = 0;
+    saveSession();
+    return;
+  }
+
+  const existingSet = new Set(session.currentQueue);
+  sortedIds.forEach(id => {
+    if(!existingSet.has(id)) session.currentQueue.push(id);
+  });
+
+  session.currentQueue = session.currentQueue.filter(id => sortedIds.includes(id));
+
+  if(session.currentIndex >= session.currentQueue.length){
+    session.currentIndex = session.currentQueue.length;
+  }
+
+  saveSession();
+}
+
+function saveSession(){
+  saveLocal(STORAGE_KEYS.session, session);
+}
+
+function getCurrentQuestion(){
+  while(session.currentIndex < session.currentQueue.length){
+    const id = session.currentQueue[session.currentIndex];
+    const q = questions.find(q => q.id === id) || null;
+    if(q && !votes[id]) return q;
+    session.currentIndex += 1;
+  }
+  return null;
+}
+
+function renderFeed(){
+  clearCountdown();
+  homeFeedArea.innerHTML = "";
+
+  setSortButtons();
+
+  let q = getCurrentQuestion();
+
+  if(!q){
+    buildQueueIfNeeded(true);
+    q = getCurrentQuestion();
+  }
+
+  if(!q){
+    homeFeedArea.innerHTML = `
+      <div class="empty-box">
+        남은 질문이 없습니다.<br>
+        질문을 등록하거나 새로고침해보세요.
+        <div class="footer-note">이미 본 질문은 다시 돌아가지 않습니다.</div>
+      </div>
+    `;
+    return;
+  }
+
+  const total = q.v1 + q.v2;
+  const alreadyVoted = Boolean(votes[q.id]);
+
+  const shell = document.createElement("div");
+  shell.className = "question-shell";
+  shell.innerHTML = `
+    <div class="card question-card" id="questionCard">
+
+      <div class="card" style="background:#fff; padding:0; overflow:hidden;">
+        ${q.type === "compare" ? `
+          <div class="thumb-grid">
+            <div>
+              <img src="${q.image || ''}" alt="item1" style="width:100%; display:block;">
+              <div class="small" style="padding:6px 8px;">${escapeHtml(q.label1 || "이것")}</div>
+            </div>
+            <div class="vs">VS</div>
+            <div>
+              <img src="${q.image2 || ''}" alt="item2" style="width:100%; display:block;">
+              <div class="small" style="padding:6px 8px;">${escapeHtml(q.label2 || "저것")}</div>
+            </div>
+          </div>
+        ` : `
+          <img src="${q.image || ''}" alt="item" style="width:100%; display:block;" id="mainImage">
+        `}
+      </div>
+      ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}</p>` : ""}
+
+      <div id="countdownArea" class="${alreadyVoted ? 'hidden' : ''}" style="margin-top:6px;">
+        <div class="progress-shell" id="countdownBar">
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+          <span class="progress-seg"></span>
+        </div>
+      </div>
+
+      <div class="home-actions" style="margin:6px 0;">
+        <button class="btn btn-danger" id="reportBtn">신고</button>
+        <span class="result-toggle" id="resultToggle">결과 보기</span>
+      </div>
+      <span id="resultMini" class="muted" style="display:none;"></span>
+
+      <div class="vote-bar" id="voteArea">
+        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "이것" : "사라"}</button>
+        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "저것" : "마라"}</button>
+      </div>
+
+      <span class="comment-toggle" id="commentToggle">댓글 보기</span>
+
+      <div id="commentArea" class="hidden">
+        <div class="hr"></div>
+        <label class="label">한줄 댓글</label>
+        <input id="commentInput" class="input" maxlength="40" placeholder="댓글을 입력하세요">
+        <div class="home-actions">
+          <button class="btn" id="commentSubmitBtn">댓글 등록</button>
+          <button class="btn btn-primary" id="nextBtn">다음 질문</button>
+        </div>
+        <div id="commentList"></div>
+      </div>
+    </div>
+  `;
+  homeFeedArea.appendChild(shell);
+
+  activeQuestionId = q.id;
+  canVote = false;
+
+  const vote1Btn = document.getElementById("vote1Btn");
+  const vote2Btn = document.getElementById("vote2Btn");
+  const resultMini = document.getElementById("resultMini");
+  const resultToggle = document.getElementById("resultToggle");
+  const commentToggle = document.getElementById("commentToggle");
+  const nextBtn = document.getElementById("nextBtn");
+  const questionCard = document.getElementById("questionCard");
+  const writeFromFeedBtn = document.getElementById("writeFromFeedBtn");
+  const reportBtn = document.getElementById("reportBtn");
+  const commentInput = document.getElementById("commentInput");
+  const commentSubmitBtn = document.getElementById("commentSubmitBtn");
+  const commentList = document.getElementById("commentList");
+
+  if(writeFromFeedBtn){
+    writeFromFeedBtn.addEventListener("click", () => showScreen("ask"));
+  }
+  reportBtn.addEventListener("click", () => {
+    reports[q.id] = { reportedAt: Date.now(), question: q };
+    saveLocal(STORAGE_KEYS.reports, reports);
+    statusText.textContent = "신고가 접수되었습니다.";
+    moveNextWithSwipe(questionCard);
+    renderAdmin();
+  });
+
+  renderMiniResult(q, resultMini);
+  resultToggle.addEventListener("click", () => {
+    const on = resultMini.style.display === "block";
+    resultMini.style.display = on ? "none" : "block";
+    resultToggle.textContent = on ? "결과 보기" : "결과 숨기기";
+  });
+
+  commentToggle.addEventListener("click", () => {
+    const on = commentArea.classList.contains("hidden");
+    commentArea.classList.toggle("hidden");
+    commentToggle.textContent = on ? "댓글 숨기기" : "댓글 보기";
+  });
+
+  if(alreadyVoted){
+    vote1Btn.disabled = true;
+    vote2Btn.disabled = true;
+    renderComments(q.id, commentList);
+    nextBtn.addEventListener("click", () => moveNextWithSwipe(questionCard));
+  }else{
+    canVote = true;
+    vote1Btn.disabled = false;
+    vote2Btn.disabled = false;
+    startCountdown(() => {
+      moveNextWithSwipe(questionCard);
+    });
+
+    vote1Btn.addEventListener("click", () => handleVote(q.id, 1, resultMini, vote1Btn, vote2Btn, nextBtn, commentList));
+    vote2Btn.addEventListener("click", () => handleVote(q.id, 2, resultMini, vote1Btn, vote2Btn, nextBtn, commentList));
+  }
+
+  commentSubmitBtn.addEventListener("click", () => {
+    const text = sanitize(commentInput.value);
+    if(!text) return;
+    if(containsBannedWord(text)){
+      statusText.textContent = "부적절한 표현이 포함되어 있습니다.";
+      return;
+    }
+    const list = comments[q.id] || [];
+    list.unshift({ text, author: currentProfile.nickname, createdAt: Date.now() });
+    comments[q.id] = list.slice(0, 20);
+    saveLocal(STORAGE_KEYS.comments, comments);
+    commentInput.value = "";
+    renderComments(q.id, commentList);
+  });
+
+}
+
+function renderPopular(){
+  const list = getSortedQuestions();
+  if(list.length === 0){
+    homeFeedArea.innerHTML = `<div class="empty-box">인기 질문이 없습니다.</div>`;
+    return;
+  }
+
+  const top = list.slice(0, 100);
+  const wrap = document.createElement("div");
+  wrap.className = "question-shell";
+
+  wrap.innerHTML = top.map((q, idx) => {
+    const total = q.v1 + q.v2;
+    const p1 = total ? Math.round((q.v1 / total) * 100) : 0;
+    const p2 = total ? Math.round((q.v2 / total) * 100) : 0;
+    return `
+      <div class="card question-card">
+        <div class="muted" style="margin-bottom:6px;">인기 질문 TOP ${idx + 1}</div>
+        <p class="q-title">Q. ${escapeHtml(maskText(q.q))}</p>
+        <div class="muted" style="margin-bottom:8px;">작성자: ${escapeHtml(q.author || "anonymous")}</div>
+        <div class="poll-wrap">
+          <span class="poll-label">YES</span>
+          <div class="poll-bar"><div class="poll-fill" style="width:${p1}%;"></div></div>
+          <span class="poll-label">${p1}%</span>
+        </div>
+        <div class="poll-wrap" style="margin-top:6px;">
+          <span class="poll-label">NO</span>
+          <div class="poll-bar"><div class="poll-fill" style="width:${p2}%; background:#6b6b6b;"></div></div>
+          <span class="poll-label">${p2}%</span>
+        </div>
+        <div class="muted" style="margin-top:8px;">참여 ${total}</div>
+        <div class="hr"></div>
+        <label class="label" style="margin-top:0;">한줄 댓글</label>
+        <input class="input" data-pop-comment="${q.id}" maxlength="40" placeholder="댓글을 입력하세요">
+        <div class="home-actions">
+          <button class="btn" data-pop-submit="${q.id}">댓글 등록</button>
+        </div>
+        <div class="muted" data-pop-list="${q.id}"></div>
+      </div>
+    `;
+  }).join("");
+
+  homeFeedArea.appendChild(wrap);
+
+  top.forEach(q => {
+    const input = wrap.querySelector(`[data-pop-comment="${q.id}"]`);
+    const btn = wrap.querySelector(`[data-pop-submit="${q.id}"]`);
+    const listEl = wrap.querySelector(`[data-pop-list="${q.id}"]`);
+    if(listEl) renderComments(q.id, listEl);
+    if(btn && input){
+      btn.addEventListener("click", () => {
+        const text = sanitize(input.value);
+        if(!text) return;
+        if(containsBannedWord(text)){
+          statusText.textContent = "부적절한 표현이 포함되어 있습니다.";
+          return;
+        }
+        const list = comments[q.id] || [];
+        list.unshift({ text, author: currentProfile.nickname, createdAt: Date.now() });
+        comments[q.id] = list.slice(0, 20);
+        saveLocal(STORAGE_KEYS.comments, comments);
+        input.value = "";
+        if(listEl) renderComments(q.id, listEl);
+      });
+    }
+  });
+}
+
+function startCountdown(onDone){
+  clearCountdown();
+  countdownValue = 5;
+  const countdownBar = document.getElementById("countdownBar");
+  const segs = countdownBar ? countdownBar.querySelectorAll('.progress-seg') : [];
+  let ticks = 0;
+
+  segs.forEach(s => s.classList.remove('on'));
+
+  countdownTimer = setInterval(() => {
+    ticks += 1;
+    const percent = Math.min((ticks / 5), 1);
+    const fillCount = Math.round(segs.length * percent);
+    segs.forEach((s, i) => s.classList.toggle('on', i < fillCount));
+
+    if(ticks >= 5){
+      clearCountdown();
+      onDone();
+    }
+  }, 1000);
+}
+
+function clearCountdown(){
+  if(countdownTimer){
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+}
+
+function handleVote(questionId, pick, resultMini, vote1Btn, vote2Btn, nextBtn, commentList){
+  if(!canVote) return;
+  const q = questions.find(item => item.id === questionId);
+  if(!q) return;
+  if(votes[questionId]) return;
+
+  if(pick === 1) q.v1 += 1;
+  else q.v2 += 1;
+
+  votes[questionId] = {
+    pick,
+    nickname: currentProfile.nickname,
+    votedAt: Date.now()
+  };
+
+  saveLocal(STORAGE_KEYS.questions, questions);
+  saveLocal(STORAGE_KEYS.votes, votes);
+
+  canVote = false;
+  vote1Btn.disabled = true;
+  vote2Btn.disabled = true;
+
+  renderComments(q.id, commentList);
+
+  updateCounts();
+
+  const questionCard = document.getElementById("questionCard");
+  nextBtn.onclick = () => moveNextWithSwipe(questionCard);
+  moveNextWithSwipe(questionCard);
+}
+
+function renderMiniResult(q, container){
+  const total = q.v1 + q.v2;
+  const p1 = total ? Math.round((q.v1 / total) * 100) : 0;
+  const p2 = total ? Math.round((q.v2 / total) * 100) : 0;
+  const labelA = q.type === "compare" ? "이것" : "사라";
+  const labelB = q.type === "compare" ? "저것" : "마라";
+  container.innerHTML = `
+    <div class="poll-wrap">
+      <span class="poll-label">${labelA}</span>
+      <div class="poll-bar"><div class="poll-fill" style="width:${p1}%;"></div></div>
+      <span class="poll-label">${p1}%</span>
+    </div>
+    <div class="poll-wrap" style="margin-top:6px;">
+      <span class="poll-label">${labelB}</span>
+      <div class="poll-bar"><div class="poll-fill" style="width:${p2}%; background:#6b6b6b;"></div></div>
+      <span class="poll-label">${p2}%</span>
+    </div>
+  `;
+}
+
+function moveNextWithSwipe(cardEl){
+  if(!cardEl) return;
+  cardEl.classList.add("swipe-out");
+  setTimeout(() => {
+    session.currentIndex += 1;
+    saveSession();
+    renderFeed();
+  }, 280);
+}
+
+function renderMyPage(){
+  updateCounts();
+
+  nicknameEdit.value = currentProfile.nickname || "";
+
+  const myQuestions = [...questions]
+    .filter(q => q.author === currentProfile.nickname)
+    .sort((a,b) => b.createdAt - a.createdAt);
+
+  const votedIds = Object.keys(votes);
+  const votedQuestions = questions.filter(q => votedIds.includes(q.id));
+
+  myQuestionList.innerHTML = "";
+
+  if(myQuestions.length === 0 && votedQuestions.length === 0){
+    myQuestionList.innerHTML = `
+      <div class="empty-box">
+        아직 작성/투표한 질문이 없습니다.
+      </div>
+    `;
+    return;
+  }
+
+  if(myQuestions.length){
+    const myWrap = document.createElement("div");
+    myWrap.className = "card";
+    myWrap.innerHTML = `
+      <div class="row-between" style="margin-bottom:6px;">
+        <span class="badge">내 질문</span>
+        <button class="btn" id="toggleMyList">열기</button>
+      </div>
+      <div id="myList" style="display:none;"></div>
+    `;
+    myQuestionList.appendChild(myWrap);
+
+    const myListEl = myWrap.querySelector("#myList");
+    const myBtn = myWrap.querySelector("#toggleMyList");
+    myBtn.addEventListener("click", () => {
+      const open = myListEl.style.display === "block";
+      myListEl.style.display = open ? "none" : "block";
+      myBtn.textContent = open ? "열기" : "닫기";
+    });
+
+    myQuestions.forEach(q => {
+      const total = q.v1 + q.v2;
+      const item = document.createElement("div");
+      item.className = "card";
+      item.innerHTML = `
+        <div class="row-between" style="margin-bottom:6px;">
+          <span class="badge">투표 ${total}</span>
+        </div>
+        <div class="q-title" style="margin-bottom:6px;">Q. ${escapeHtml(q.q)}</div>
+        <div class="muted" style="display:none;">
+          1) ${escapeHtml(q.a1)} (${q.v1})<br>
+          2) ${escapeHtml(q.a2)} (${q.v2})
+        </div>
+      `;
+      item.addEventListener("click", () => {
+        const detail = item.querySelector(".muted");
+        if(!detail) return;
+        detail.style.display = (detail.style.display === "none") ? "block" : "none";
+      });
+      myListEl.appendChild(item);
+    });
+  }
+
+  if(votedQuestions.length){
+    const wrap = document.createElement("div");
+    wrap.className = "card";
+    wrap.innerHTML = `
+      <div class="row-between" style="margin-bottom:6px;">
+        <span class="badge">내 투표 목록</span>
+        <button class="btn" id="toggleVotedList">열기</button>
+      </div>
+      <div id="votedList" style="display:none;"></div>
+    `;
+    myQuestionList.appendChild(wrap);
+
+    const listEl = wrap.querySelector("#votedList");
+    const btn = wrap.querySelector("#toggleVotedList");
+    btn.addEventListener("click", () => {
+      const open = listEl.style.display === "block";
+      listEl.style.display = open ? "none" : "block";
+      btn.textContent = open ? "열기" : "닫기";
+    });
+
+    votedQuestions
+      .sort((a,b) => (b.v1 + b.v2) - (a.v1 + a.v2))
+      .forEach(q => {
+        const total = q.v1 + q.v2;
+        const item = document.createElement("div");
+        item.className = "card";
+        item.innerHTML = `
+          <div class="row-between" style="margin-bottom:6px;">
+            <span class="badge">투표 ${total}</span>
+          </div>
+          <div class="q-title" style="margin-bottom:6px;">Q. ${escapeHtml(q.q)}</div>
+          <div class="muted" style="display:none;">
+            1) ${escapeHtml(q.a1)} (${q.v1})<br>
+            2) ${escapeHtml(q.a2)} (${q.v2})
+          </div>
+        `;
+        item.addEventListener("click", () => {
+          const detail = item.querySelector(".muted");
+          if(!detail) return;
+          detail.style.display = (detail.style.display === "none") ? "block" : "none";
+        });
+        listEl.appendChild(item);
+      });
+  }
+}
+
+function renderAdmin(){
+  adminReportList.innerHTML = "";
+  const entries = Object.entries(reports);
+  if(entries.length === 0){
+    adminReportList.innerHTML = `<div class="empty-box">신고된 글이 없습니다.</div>`;
+    return;
+  }
+
+  entries.forEach(([id, rep]) => {
+    const q = rep.question || questions.find(x => x.id === id) || { q: "(삭제됨)", author:"unknown" };
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="q-title">Q. ${escapeHtml(q.q)}</div>
+      <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
+      <div class="home-actions" style="margin-top:10px;">
+        <button class="btn" data-action="unreport" data-id="${id}">신고 해제</button>
+        <button class="btn btn-danger" data-action="delete" data-id="${id}">삭제</button>
+        <button class="btn" data-action="ban" data-author="${escapeHtml(q.author || "unknown")}">이용중지</button>
+      </div>
+    `;
+    adminReportList.appendChild(card);
+  });
+
+  adminReportList.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      if(action === "unreport"){
+        delete reports[id];
+        saveLocal(STORAGE_KEYS.reports, reports);
+        renderAdmin();
+      }
+      if(action === "delete"){
+        questions = questions.filter(q => q.id !== id);
+        delete reports[id];
+        saveLocal(STORAGE_KEYS.questions, questions);
+        saveLocal(STORAGE_KEYS.reports, reports);
+        renderAdmin();
+      }
+      if(action === "ban"){
+        const author = btn.dataset.author;
+        if(author && author !== "unknown"){
+          bannedUsers[author] = { bannedAt: Date.now() };
+          saveLocal(STORAGE_KEYS.banned, bannedUsers);
+        }
+        renderAdmin();
+      }
+    });
+  });
+}
+
+function setSortButtons(){
+  if(session.sort === "latest"){
+    sortLatestBtn.classList.add("active");
+    sortPopularBtn.classList.remove("active");
+  }else{
+    sortLatestBtn.classList.remove("active");
+    sortPopularBtn.classList.add("active");
+  }
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+
+function renderComments(qid, container){
+  const list = comments[qid] || [];
+  container.innerHTML = list.map(c => {
+    const text = maskText(escapeHtml(c.text));
+    return `<div class="muted">${escapeHtml(c.author)} : ${text}</div>`;
+  }).join("") || "<div class=\"muted\">아직 댓글이 없습니다.</div>";
+}
+
+function enableSwipe(cardEl, onSwipe){
+  if(!cardEl) return;
+  let startX = 0;
+  let currentX = 0;
+  let dragging = false;
+
+  const start = (e) => {
+    dragging = true;
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    cardEl.style.transition = "none";
+  };
+
+  const move = (e) => {
+    if(!dragging) return;
+    currentX = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = Math.max(0, currentX - startX);
+    cardEl.style.transform = `translateX(${dx}px)`;
+  };
+
+  const end = () => {
+    if(!dragging) return;
+    dragging = false;
+    const dx = Math.max(0, currentX - startX);
+    cardEl.style.transition = "transform .2s ease";
+    if(dx > 80){
+      onSwipe();
+    }
+    cardEl.style.transform = "translateX(0)";
+  };
+
+  cardEl.addEventListener("mousedown", start);
+  cardEl.addEventListener("mousemove", move);
+  cardEl.addEventListener("mouseup", end);
+  cardEl.addEventListener("mouseleave", end);
+  cardEl.addEventListener("touchstart", start, {passive:true});
+  cardEl.addEventListener("touchmove", move, {passive:true});
+  cardEl.addEventListener("touchend", end);
+}
+
+saveProfileBtn.addEventListener("click", () => {
+  const nick = sanitize(nicknameInput.value);
+  const gender = genderSelect.value;
+  const age = parseInt(ageInput.value, 10);
+  const pw = passwordInput.value.trim();
+  const err = validateProfile(nick, pw, age, "ok");
+  profileMessage.className = "error";
+  profileMessage.textContent = err;
+  if(err) return;
+  currentProfile = { nickname: nick, gender, age, region: "", password: pw };
+  saveLocal(STORAGE_KEYS.profile, currentProfile);
+
+  if(!loadLocal(STORAGE_KEYS.questions, null)){
+    saveLocal(STORAGE_KEYS.questions, questions);
+  }
+
+  openApp();
+});
+
+enterTestBtn.addEventListener("click", () => {
+  currentProfile = {...TEST_PROFILE};
+  saveLocal(STORAGE_KEYS.profile, currentProfile);
+  nicknameInput.value = "1234";
+  genderSelect.value = "male";
+  ageInput.value = 24;
+  passwordInput.value = "1234";
+  openApp();
+});
+
+
+navLinks.forEach(link => {
+  link.addEventListener("click", () => {
+    const target = link.dataset.nav;
+    showScreen(target);
+    if(target === "home") renderFeed();
+    if(target === "my") renderMyPage();
+    if(target === "admin") renderAdmin();
+  });
+});
+
+sortLatestBtn.addEventListener("click", () => {
+  session.sort = "latest";
+  buildQueueIfNeeded(true);
+  saveSession();
+  renderFeed();
+});
+
+sortPopularBtn.addEventListener("click", () => {
+  session.sort = "popular";
+  buildQueueIfNeeded(true);
+  saveSession();
+  renderFeed();
+});
+
+refreshFeedBtn.addEventListener("click", () => {
+  buildQueueIfNeeded(true);
+  renderFeed();
+});
+
+goAskBtn.addEventListener("click", () => showScreen("ask"));
+backHomeFromAskBtn.addEventListener("click", () => {
+  showScreen("home");
+  renderFeed();
+});
+
+questionInput.addEventListener("input", () => {
+  questionCount.textContent = questionInput.value.length;
+});
+
+questionType.addEventListener("change", () => {
+  const isCompare = questionType.value === "compare";
+  compareBlock.style.display = isCompare ? "block" : "none";
+});
+
+resetAskBtn.addEventListener("click", () => {
+  questionInput.value = "";
+  questionCount.textContent = "0";
+  askMessage.textContent = "";
+  askMessage.className = "error";
+});
+
+submitQuestionBtn.addEventListener("click", () => {
+  const q = sanitize(questionInput.value);
+  if(bannedUsers[currentProfile.nickname]){
+    askMessage.className = "error";
+    askMessage.textContent = "이용이 제한된 계정입니다.";
+    return;
+  }
+
+  const isCompare = questionType.value === "compare";
+  if(!imageInput.files || imageInput.files.length === 0){
+    askMessage.className = "error";
+    askMessage.textContent = "1번 이미지를 업로드해주세요.";
+    return;
+  }
+  if(isCompare){
+    if(!imageInput2.files || imageInput2.files.length === 0){
+      askMessage.className = "error";
+      askMessage.textContent = "저것 이미지를 업로드해주세요.";
+      return;
+    }
+  }
+
+  const err = validateQuestion(q);
+  askMessage.className = err ? "error" : "ok";
+  askMessage.textContent = err || "등록되었습니다.";
+  if(err) return;
+
+  const file1 = imageInput.files[0];
+  const reader1 = new FileReader();
+  reader1.onload = () => {
+    if(!isCompare){
+      const newQuestion = {
+        id: makeId(),
+        q,
+        type: "single",
+        image: reader1.result,
+        a1: "사라",
+        a2: "마라",
+        v1: 0,
+        v2: 0,
+        author: currentProfile.nickname,
+        createdAt: Date.now()
+      };
+      questions.push(newQuestion);
+      saveLocal(STORAGE_KEYS.questions, questions);
+      buildQueueIfNeeded(false);
+      updateCounts();
+      renderMyPage();
+
+      questionInput.value = "";
+      questionCount.textContent = "0";
+      imageInput.value = "";
+      const ok = confirm("등록 완료");
+      if(ok){
+        session.sort = "latest";
+        buildQueueIfNeeded(true);
+        showScreen("home");
+        renderFeed();
+      }
+      return;
+    }
+
+    const file2 = imageInput2.files[0];
+    const reader2 = new FileReader();
+    reader2.onload = () => {
+      const newQuestion = {
+        id: makeId(),
+        q,
+        type: "compare",
+        image: reader1.result,
+        image2: reader2.result,
+        label1: "이것",
+        label2: "저것",
+        a1: "이것",
+        a2: "저것",
+        v1: 0,
+        v2: 0,
+        author: currentProfile.nickname,
+        createdAt: Date.now()
+      };
+
+      questions.push(newQuestion);
+      saveLocal(STORAGE_KEYS.questions, questions);
+      buildQueueIfNeeded(false);
+      updateCounts();
+      renderMyPage();
+
+      questionInput.value = "";
+      questionCount.textContent = "0";
+      imageInput.value = "";
+      imageInput2.value = "";
+
+      const ok = confirm("등록 완료");
+      if(ok){
+        session.sort = "popular";
+        buildQueueIfNeeded(true);
+        showScreen("home");
+        renderFeed();
+      }
+    };
+    reader2.readAsDataURL(file2);
+  };
+  reader1.readAsDataURL(file1);
+});
+
+
+saveProfileEditBtn.addEventListener("click", () => {
+  const nextNick = nicknameEdit.value.trim();
+  const now = Date.now();
+  const monthMs = 30 * 24 * 60 * 60 * 1000;
+
+  if(!nextNick || nextNick.length < 2 || nextNick.length > 12){
+    myMessage.className = "error";
+    myMessage.textContent = "닉네임은 2~12자여야 합니다.";
+    return;
+  }
+  if(containsBannedWord(nextNick)){
+    myMessage.className = "error";
+    myMessage.textContent = "닉네임에 부적절한 표현이 포함되어 있습니다.";
+    return;
+  }
+  if(nextNick !== currentProfile.nickname && (now - (currentProfile.lastNickChangeAt || 0)) < monthMs){
+    myMessage.className = "error";
+    myMessage.textContent = "닉네임은 월 1회만 변경할 수 있습니다.";
+    return;
+  }
+
+  if(nextNick !== currentProfile.nickname){
+    currentProfile.nickname = nextNick;
+    currentProfile.lastNickChangeAt = now;
+  }
+  saveLocal(STORAGE_KEYS.profile, currentProfile);
+  updateCounts();
+  myMessage.className = "ok";
+  myMessage.textContent = "프로필이 저장되었습니다.";
+});
+
+resetAllBtn.addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEYS.profile);
+  localStorage.removeItem(STORAGE_KEYS.questions);
+  localStorage.removeItem(STORAGE_KEYS.votes);
+  localStorage.removeItem(STORAGE_KEYS.comments);
+  localStorage.removeItem(STORAGE_KEYS.reports);
+  localStorage.removeItem(STORAGE_KEYS.session);
+  localStorage.removeItem(STORAGE_KEYS.shuffled);
+
+  currentProfile = {...TEST_PROFILE};
+  questions = [...defaultQuestions];
+  votes = {};
+  comments = {};
+  reports = {};
+  session = { sort: "latest", currentQueue: [], currentIndex: 0 };
+
+  saveLocal(STORAGE_KEYS.profile, currentProfile);
+  saveLocal(STORAGE_KEYS.questions, questions);
+  saveLocal(STORAGE_KEYS.votes, votes);
+  saveLocal(STORAGE_KEYS.comments, comments);
+  saveLocal(STORAGE_KEYS.reports, reports);
+  saveLocal(STORAGE_KEYS.session, session);
+
+  nicknameInput.value = "1234";
+  passwordInput.value = "1234";
+  myMessage.className = "ok";
+  myMessage.textContent = "전체 데이터가 초기화되었습니다.";
+  openApp();
+});
+
+makeDraggable(welcomeWindow);
+makeDraggable(appWindow);
+boot();
+</script>
+</body>
+</html>
