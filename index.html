@@ -1469,7 +1469,7 @@ function renderMyPage(){
 
   const sections = {
     my: { title: "내 질문", listId: "myList", toggleId: "toggleMyList", items: myQuestions },
-    voted: { title: "내 결정 목록", listId: "votedList", toggleId: "toggleVotedList", items: votedQuestions },
+    voted: { title: "내 투표현황", listId: "votedList", toggleId: "toggleVotedList", items: votedQuestions },
     fav: { title: "즐겨찾기 목록", listId: "favList", toggleId: "toggleFavList", items: favQuestions }
   };
 
@@ -1482,17 +1482,10 @@ function renderMyPage(){
     wrap.innerHTML = `
       <div class="row-between" style="margin-bottom:6px;">
         <span class="badge">${sec.title}</span>
-        <button class="btn" id="${sec.toggleId}">열기</button>
       </div>
       <div id="${sec.listId}" style="display:none;"></div>
     `;
     const listEl = wrap.querySelector(`#${sec.listId}`);
-    const btn = wrap.querySelector(`#${sec.toggleId}`);
-    btn.addEventListener("click", () => {
-      const open = listEl.style.display === "block";
-      listEl.style.display = open ? "none" : "block";
-      btn.textContent = open ? "열기" : "닫기";
-    });
 
     sec.items.forEach(q => {
       const total = q.v1 + q.v2;
@@ -1535,24 +1528,22 @@ function renderMyPage(){
   const favWrap = makeSection("fav");
   [myWrap, votedWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
 
-  const hookToggle = (btnId, sectionId, listId, toggleId) => {
+  const hookToggle = (btnId, sectionId, listId) => {
     const btn = document.getElementById(btnId);
     const section = document.getElementById(sectionId);
     if(!btn || !section) return;
     btn.onclick = () => {
       const listEl = section.querySelector(`#${listId}`);
-      const toggleBtn = section.querySelector(`#${toggleId}`);
-      if(!listEl || !toggleBtn) return;
+      if(!listEl) return;
       const open = listEl.style.display === "block";
       listEl.style.display = open ? "none" : "block";
-      toggleBtn.textContent = open ? "열기" : "닫기";
       section.scrollIntoView({behavior:"smooth", block:"start"});
     };
   };
 
-  hookToggle("btnMyQuestions", "section-my", "myList", "toggleMyList");
-  hookToggle("btnMyVotes", "section-voted", "votedList", "toggleVotedList");
-  hookToggle("btnMyFavs", "section-fav", "favList", "toggleFavList");
+  hookToggle("btnMyQuestions", "section-my", "myList");
+  hookToggle("btnMyVotes", "section-voted", "votedList");
+  hookToggle("btnMyFavs", "section-fav", "favList");
 }
 
 function renderAdmin(){
@@ -1885,6 +1876,7 @@ submitQuestionBtn.addEventListener("click", () => {
 
 
 saveProfileEditBtn.addEventListener("click", () => {
+  alert("닉네임 변경은 월 1회만 가능합니다.");
   const nextNick = nicknameEdit.value.trim();
   const now = Date.now();
   const monthMs = 30 * 24 * 60 * 60 * 1000;
@@ -1899,7 +1891,6 @@ saveProfileEditBtn.addEventListener("click", () => {
     myMessage.textContent = "닉네임에 부적절한 표현이 포함되어 있습니다.";
     return;
   }
-  alert("닉네임 변경은 월 1회만 가능합니다.");
   if(nextNick !== currentProfile.nickname){
     currentProfile.nickname = nextNick;
     currentProfile.lastNickChangeAt = now;
