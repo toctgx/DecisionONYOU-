@@ -724,7 +724,11 @@ function loadLocal(key, fallback){
 }
 
 function saveLocal(key, value){
-  localStorage.setItem(key, JSON.stringify(value));
+  try{
+    localStorage.setItem(key, JSON.stringify(value));
+  }catch(e){
+    // ignore storage errors (e.g., external-file sandbox)
+  }
 }
 
 function shuffleArray(arr){
