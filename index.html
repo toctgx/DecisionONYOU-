@@ -850,6 +850,11 @@ function openApp(){
   showScreen("home");
   renderFeed();
   renderMyPage();
+  setTimeout(() => {
+    if(homeFeedArea && homeFeedArea.innerHTML.trim() === ""){
+      renderFeed();
+    }
+  }, 50);
 }
 
 function makeDraggable(win){
