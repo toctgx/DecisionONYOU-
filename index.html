@@ -323,7 +323,7 @@
   .center{text-align:center;}
 
   .welcome-note{line-height:1.5; font-size:13px;}
-  .home-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+  .home-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; margin-bottom:12px;}
 
   .comment-input{
     display:flex; align-items:center; gap:8px;
@@ -1093,10 +1093,10 @@ function renderFeed(){
       </div>
 
       <div class="home-actions" style="margin:6px 0;">
-        <button class="icon-btn" id="reportBtn" title="신고" style="width:auto; padding:4px 10px; font-size:12px; font-weight:700;">
+        <button class="icon-btn" id="reportBtn" title="신고" style="width:auto; padding:6px 12px; font-size:13px; font-weight:700;">
           신고
         </button>
-        <button class="icon-btn" id="commentToggle" title="댓글달기" style="width:auto; padding:4px 10px; font-size:12px; font-weight:700;">댓글달기</button>
+        <button class="icon-btn" id="commentToggle" title="댓글달기" style="width:auto; padding:6px 12px; font-size:13px; font-weight:700;">댓글달기</button>
       </div>
       <div class="vote-bar" id="voteArea">
         <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
