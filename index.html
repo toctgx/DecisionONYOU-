@@ -723,6 +723,21 @@ function loadLocal(key, fallback){
   }
 }
 
+function safeRenderFeed(){
+  try{
+    renderFeed();
+    if(homeFeedArea && homeFeedArea.innerHTML.trim() === ""){
+      questions = [...defaultQuestions];
+      renderFeed();
+    }
+  }catch(e){
+    try{
+      questions = [...defaultQuestions];
+      renderFeed();
+    }catch(_){}
+  }
+}
+
 function saveLocal(key, value){
   try{
     localStorage.setItem(key, JSON.stringify(value));
@@ -852,13 +867,8 @@ function openApp(){
   }
   updateCounts();
   showScreen("home");
-  renderFeed();
+  safeRenderFeed();
   renderMyPage();
-  setTimeout(() => {
-    if(homeFeedArea && homeFeedArea.innerHTML.trim() === ""){
-      renderFeed();
-    }
-  }, 50);
 }
 
 function makeDraggable(win){
@@ -1217,7 +1227,7 @@ function renderFeed(){
     vote1Btn.disabled = false;
     vote2Btn.disabled = false;
     startCountdown(() => {
-      moveNextWithSwipe(questionCard);
+      moveNextImmediate();
     });
 
     vote1Btn.addEventListener("click", () => handleVote(q.id, 1, resultMini, vote1Btn, vote2Btn, nextBtn, commentList));
@@ -1403,13 +1413,9 @@ function handleVote(questionId, pick, resultMini, vote1Btn, vote2Btn, nextBtn, c
   vote1Btn.disabled = true;
   vote2Btn.disabled = true;
 
-  renderComments(q.id, commentList);
-
   updateCounts();
   clearCountdown();
 
-  const questionCard = document.getElementById("questionCard");
-  if(nextBtn) nextBtn.onclick = () => moveNextWithSwipe(questionCard);
   moveNextImmediate();
 }
 
