@@ -3,27 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AnswerMe.exe</title>
+  <title>DecisionONYOU</title>
   <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@600;700;800&display=swap');
   :root{
-    --desktop:#ffffff;
-    --win-gray:#ffffff;
-    --win-light:#ffffff;
-    --win-dark:#111111;
-    --win-black:#111111;
-    --title:#111111;
+    --desktop:#0b0b0b;
+    --win-gray:#0f0f10;
+    --win-light:#141414;
+    --win-dark:#2a2a2a;
+    --win-black:#e6e6e6;
+    --title:#e6e6e6;
     --white:#ffffff;
-    --text:#111111;
-    --danger:#ef476f;
-    --ok:#06d6a0;
-    --accent:#ffcf3d;
-    --accent2:#4f8bff;
+    --text:#f2f2f2;
+    --danger:#ff3b30;
+    --ok:#8e8e93;
+    --accent:#bfbfbf;
+    --accent2:#8e8e93;
   }
 
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:"Inter","Noto Sans KR", Helvetica, Arial, sans-serif;
     background:var(--desktop);
     color:var(--text);
     min-height:100vh;
@@ -44,51 +45,105 @@
     width:100%;
     max-width:460px;
     background:var(--win-gray);
-    border:3px solid var(--win-black);
-    box-shadow:none;
+    border:1px solid #2a2a2a;
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
     transform:translate3d(0,0,0);
     display:flex;
     flex-direction:column;
   }
 
-  .content{padding:2px 4px; max-height:calc(100vh - 100px); overflow:hidden; display:flex; flex-direction:column;}
+  :root{--nav-h:72px;}
+  .content{padding:2px 4px calc(var(--nav-h) + 72px); max-height:calc(100vh - 100px); overflow:auto; display:flex; flex-direction:column;}
   #screen-home{display:flex; flex-direction:column; gap:6px; flex:1;}
-  #homeFeedArea{flex:1; display:flex; flex-direction:column;}
+  #homeFeedArea{flex:1; display:flex; flex-direction:column; padding-bottom:12px;}
   .vote-bar{position:sticky; bottom:0; background:var(--win-gray); padding:6px; border-top:1px solid var(--win-dark); display:flex; gap:8px;}
-  .result-toggle{margin-left:auto; font-size:12px; cursor:pointer; color:#333;}
+  .result-toggle{margin-left:auto; font-size:12px; cursor:pointer; color:#bfbfbf;}
   .thumb-grid{display:grid; grid-template-columns:1fr auto 1fr; gap:2px; align-items:center;}
-  .thumb-grid .vs{font-weight:700; padding:0 6px;}
+  .thumb-grid .vs{font-weight:700; padding:0 6px; color:#bfbfbf;}
   .countdot{display:inline-flex; gap:4px; align-items:center;}
   .countdot span{width:6px; height:6px; border-radius:50%; background:#bbb; display:inline-block;}
   .countdot span.on{background:#222;}
-  .comment-toggle{font-size:12px; cursor:pointer; color:#333; margin:6px 0; display:inline-block;}
+  .comment-toggle{
+    display:block; width:100%;
+    font-size:12px; cursor:pointer; color:#f2f2f2;
+    margin:8px 0; padding:8px 10px;
+    border:none; border-radius:8px; background:transparent;
+  }
+  #commentArea{margin-top:10px; padding-bottom:16px; margin-bottom:calc(var(--nav-h) + 12px);} 
+  #commentList{max-height:120px; overflow:auto;}
 
   .window.hidden{display:none}
 
   .titlebar{
-    background:var(--accent2);
-    color:#fff;
+    background:#0b0b0b;
+    color:#e6e6e6;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:6px 8px;
-    font-size:12px;
-    font-weight:800;
+    padding:12px 14px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.6px;
     user-select:none;
+    border-bottom:1px solid #2a2a2a;
   }
   #splashWindow .titlebar{display:none;}
-  @keyframes bauhausPulse{0%{letter-spacing:2px; transform:translateY(0);}50%{letter-spacing:4px; transform:translateY(-2px);}100%{letter-spacing:2px; transform:translateY(0);}}
+  @keyframes bauhausPulse{0%{letter-spacing:1px; transform:translateY(0);}50%{letter-spacing:2px; transform:translateY(-2px);}100%{letter-spacing:1px; transform:translateY(0);}}
+  .splash-logo{font-family:'Noto Sans KR', Arial, sans-serif; font-weight:900; text-align:center; line-height:1.1;}
+  .splash-logo .on{color:#e53935;}
+  .splash-logo .you{color:#2b6cb0;}
 
-
-  .menubar{
-    padding:6px 8px;
-    border-bottom:1px solid var(--win-dark);
-    display:flex;
-    gap:10px;
-    font-size:12px;
-    background:var(--win-gray);
-    flex-wrap:wrap;
+  .splash-artboard-wrap{display:flex; justify-content:center; align-items:center; width:100%; height:100%;}
+  .splash-artboard{
+    position:relative; width:1200px; height:800px; background:#f5f3ef; overflow:visible;
+    transform-origin:center;
+    transform:scale(min(calc(100vw / 1200), calc(100vh / 800)));
   }
+
+  .splash-text{position:absolute; left:300px; top:210px; z-index:5; line-height:0.9;}
+  .splash-line1,.splash-line2{display:flex; align-items:center; gap:24px; font-weight:900; letter-spacing:-6px; text-transform:uppercase; font-family:"Arial Black", Arial, Helvetica, sans-serif;}
+  .splash-line1{font-size:150px; color:#262626;}
+  .splash-line2{margin-top:10px; font-size:185px; color:#f04a2a; letter-spacing:-10px;}
+  .shape{position:absolute;}
+  .yellow{background:#f3c23a;} .red{background:#f04a2a;} .blue{background:#3f84c5;} .black{background:#2e2e2e;} .line{background:#444;}
+  .circle{border-radius:50%;} .square{width:64px; height:64px;} .rounded-bar{border-radius:999px;}
+  .c1{width:170px;height:170px;left:190px;top:110px;} .sq1{width:18px;height:18px;left:495px;top:140px;} .c2{width:30px;height:30px;left:695px;top:205px;} .sq2{width:74px;height:74px;left:910px;top:155px;} .sq3{width:26px;height:26px;left:1005px;top:255px;}
+  .bar1{width:75px;height:12px;left:190px;top:385px;} .c3{width:42px;height:42px;left:1040px;top:445px;} .sq4{width:60px;height:60px;left:230px;top:590px;} .sq5{width:70px;height:70px;left:300px;top:540px;} .c4{width:28px;height:28px;left:555px;top:615px;} .c5{width:170px;height:170px;left:960px;top:525px;}
+  .l1{width:390px;height:2px;left:290px;top:205px;} .l2{width:2px;height:140px;left:290px;top:205px;} .l3{width:2px;height:85px;left:480px;top:120px;} .l4{width:220px;height:2px;left:660px;top:600px;} .l5{width:2px;height:150px;left:1000px;top:480px;} .l6{width:145px;height:2px;left:855px;top:630px;} .l7{width:230px;height:2px;left:300px;top:620px;}
+  .parallel,.parallel2,.parallel3{position:absolute; display:flex; flex-direction:column; gap:10px;}
+  .parallel span,.parallel2 span,.parallel3 span{display:block; height:2px; background:#444;}
+  .parallel{left:1000px;top:315px;} .parallel span{width:72px;}
+  .parallel2{left:238px;top:485px;} .parallel2 span{width:65px;}
+  .parallel3{left:825px;top:623px;flex-direction:row;gap:10px;} .parallel3 span{width:2px;height:72px;background:#e2b32b;}
+  .tiny-yellow{position:absolute;width:46px;height:3px;background:#f3c23a;left:265px;top:470px;}
+  .tiny-yellow-2{position:absolute;width:36px;height:3px;background:#f3c23a;left:855px;top:212px;}
+  .tiny-mark{position:absolute;width:18px;height:3px;background:#f3c23a;left:866px;top:218px;transform:rotate(25deg);transform-origin:left center;}
+
+  .menubar{display:none;}
+  .bottom-nav{
+    position:fixed; bottom:0; left:0; right:0; z-index:5;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; padding:10px 16px 12px; background:#0b0b0b;
+    border-top:none; height:var(--nav-h); box-sizing:border-box;
+    padding-bottom:calc(12px + env(safe-area-inset-bottom));
+  }
+  .bottom-nav::before{
+    content:""; position:absolute; left:0; right:0; top:4px; height:1px; background:#2a2a2a;
+  }
+  .bottom-nav .nav-link{
+    flex:1; display:flex; align-items:center; justify-content:center;
+    padding:8px 0; cursor:pointer;
+    background:transparent; border:none; color:#f2f2f2;
+  }
+  .bottom-nav .nav-link svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2;}
+  .bottom-nav .nav-link.active{color:#ffffff;}
+  .nav-center{
+    width:54px; height:54px; border-radius:50%;
+    background:#0b0b0b; border:2px solid #2a2a2a;
+    display:flex; align-items:center; justify-content:center;
+    transform:translateY(-12px);
+  }
+  .nav-center span{font-size:12px; font-weight:700; letter-spacing:.6px; color:#f2f2f2;}
 
   .content{
     padding:2px 4px;
@@ -107,50 +162,72 @@
   }
 
   .panel{
-    background:#fff;
-    padding:8px;
-    margin-bottom:8px;
-    border:3px solid var(--win-black);
-    border-radius:0;
+    background:#141414;
+    padding:10px;
+    margin-bottom:10px;
+    border:1px solid #2a2a2a;
+    border-radius:8px;
   }
 
   .card{
-    background:#fff;
-    padding:6px;
-    margin-bottom:8px;
-    border:3px solid var(--win-black);
-    border-radius:0;
+    background:#141414;
+    padding:8px;
+    margin-bottom:10px;
+    border:1px solid #2a2a2a;
+    border-radius:8px;
   }
-  .question-card .card{padding:0; margin-bottom:10px;}
+  .question-card .card{padding:0; margin-bottom:12px;}
 
   .q-title{
-    font-size:16px;
-    font-weight:bold;
-    line-height:1.3;
+    font-size:17px;
+    font-weight:700;
+    line-height:1.35;
     margin:6px 0 6px;
     word-break:keep-all;
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
   }
+  .new-badge{
+    font-size:11px; font-weight:700; color:#fff; background:#ff3b30;
+    padding:2px 6px; border-radius:10px;
+  }
+  .icon-btn{
+    background:transparent; border:none;
+    padding:4px 6px; width:32px; height:32px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; line-height:1; color:#e6e6e6;
+  }
+  .icon-btn svg{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2;}
+  .icon-btn.active{opacity:.85;}
 
-  .muted{color:#333; font-size:12px;}
+  .muted{color:#e0e0e0; font-size:12px;}
 
   .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
   .row-between{display:flex; justify-content:space-between; gap:8px; align-items:center;}
 
   .tabs{display:flex; gap:6px; margin:6px 0 8px; flex-wrap:wrap;}
+  .type-toggle{display:flex; flex-direction:column; gap:8px;}
+  .type-btn{width:100%;}
+  .type-btn.active{outline:1px solid #8e8e93;}
 
   .btn{
     appearance:none;
-    background:#fff;
-    color:#000;
-    padding:10px 12px;
-    font-size:13px;
-    min-height:36px;
-    border:3px solid var(--win-black);
-    border-radius:0;
+    background:#1a1a1a;
+    color:#f2f2f2;
+    padding:11px 12px;
+    font-size:14px;
+    min-height:38px;
+    border:1px solid #2a2a2a;
+    border-radius:8px;
     cursor:pointer;
     font-family:inherit;
-    font-weight:800;
+    font-weight:700;
   }
+  .tabs .btn{min-height:40px; font-size:14px;}
+  .tabs .btn:nth-child(1){background:#1a1a1a;}
+  .tabs .btn:nth-child(2){background:#1a1a1a;}
+  .tabs .btn.active{outline:1px solid #8e8e93;}
+  #voteArea .btn:nth-child(1){background:#1a1a1a;}
+  #voteArea .btn:nth-child(2){background:#1a1a1a;}
 
   .btn:active,
   .btn.active{
@@ -162,29 +239,27 @@
   .btn-danger{color:var(--danger); font-weight:bold;}
   .btn-wide{width:100%; text-align:left; display:block;}
 
-  .poll-wrap{display:flex; align-items:center; gap:8px; font-size:12px; color:#333;}
+  .poll-wrap{display:flex; align-items:center; gap:8px; font-size:12px; color:#e0e0e0;}
   .poll-bar{flex:1; height:16px; background:#fff; border-top:2px solid var(--win-dark); border-left:2px solid var(--win-dark); border-right:2px solid var(--white); border-bottom:2px solid var(--white); padding:2px;}
   .poll-fill{height:100%; background:#2e8b57; width:0%; min-width:2px; transition:width .2s linear;}
   .poll-label{font-weight:700; min-width:30px;}
 
   .input,.textarea{
     width:100%;
-    background:#fff;
-    color:#000;
-    border-top:2px solid var(--win-dark);
-    border-left:2px solid var(--win-dark);
-    border-right:2px solid var(--white);
-    border-bottom:2px solid var(--white);
+    background:#141414;
+    color:#f2f2f2;
+    border:1px solid #2a2a2a;
     padding:10px;
     font-family:inherit;
     font-size:14px;
     outline:none;
     border-radius:8px;
   }
+  .input::placeholder,.textarea::placeholder{color:#8e8e93;}
 
   .textarea{resize:none; min-height:92px;}
   .label{display:block; margin:10px 0 6px; font-size:13px; font-weight:bold;}
-  .small{font-size:12px;}
+  .small{font-size:12px; color:#e0e0e0;}
 
   .error{color:var(--danger); font-size:12px; margin-top:6px; white-space:pre-line;}
   .ok{color:var(--ok); font-size:12px; margin-top:6px; white-space:pre-line;}
@@ -197,15 +272,12 @@
   .progress-shell{
     width:100%;
     height:22px;
-    background:#fff;
-    border-top:2px solid var(--win-dark);
-    border-left:2px solid var(--win-dark);
-    border-right:2px solid var(--white);
-    border-bottom:2px solid var(--white);
+    background:transparent;
+    border:none;
     margin:6px 0;
     display:flex;
-    gap:2px;
-    padding:3px;
+    gap:4px;
+    padding:0;
   }
   .progress-seg{flex:1; background:#fff; border:1px solid #222;}
   .progress-seg.on{background:#222;}
@@ -228,27 +300,43 @@
 
   .badge{
     display:inline-block;
-    padding:2px 6px;
-    background:#fff;
-    border-top:2px solid var(--win-dark);
-    border-left:2px solid var(--win-dark);
-    border-right:2px solid var(--white);
-    border-bottom:2px solid var(--white);
+    padding:4px 8px;
+    background:#141414;
+    border:1px solid #2a2a2a;
+    color:#f2f2f2;
     font-size:12px;
     margin-right:6px;
     margin-bottom:6px;
+    border-radius:8px;
   }
+  .badge-btn{cursor:pointer;}
 
   .hidden{display:none !important;}
   .center{text-align:center;}
 
   .welcome-note{line-height:1.5; font-size:13px;}
   .home-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+
+  .comment-input{
+    display:flex; align-items:center; gap:8px;
+    background:#141414; border:1px solid #2a2a2a; border-radius:14px;
+    padding:8px 12px; margin-bottom:12px;
+    box-shadow:0 0 0 1px #2a2a2a inset;
+  }
+  .comment-input input{
+    flex:1; border:none; outline:none; font-size:13px; background:transparent; color:#f2f2f2;
+  }
+  .comment-input input::placeholder{color:#8e8e93;}
+  .comment-send{
+    min-width:56px; height:34px; border-radius:10px; border:none; background:#3b6bff; color:#fff;
+    font-size:13px; font-weight:700; cursor:pointer; padding:0 10px;
+  }
+  .comment-send:disabled{background:#8aa3ff;}
   .splash-img{width:100%; display:block; border-top:2px solid var(--win-dark); border-left:2px solid var(--win-dark); border-right:2px solid var(--white); border-bottom:2px solid var(--white);}
   .consent{display:flex; gap:6px; align-items:flex-start; font-size:12px; margin-top:6px;}
 
   .question-shell{position:relative; min-height:auto; overflow:hidden;}
-  .question-card img{aspect-ratio:1/1; object-fit:cover; width:100%; max-height:56vh;}
+  .question-card img{aspect-ratio:1/1; object-fit:cover; width:100%; max-height:60vh; border-radius:8px;}
   @media (max-height:760px){
     .question-card img{max-height:36vh;}
     .q-title{font-size:15px; margin:4px 0;}
@@ -299,18 +387,6 @@
 </head>
 <body>
 <div class="desktop">
-
-  <!-- SPLASH -->
-  <section class="window" id="splashWindow">
-    <div class="titlebar" style="background: var(--accent2); padding:10px 12px;">
-      <div class="titlebar-title" style="color:#fff; font-size:20px; font-weight:800; letter-spacing:1px; white-space:nowrap;">결정장애ON YOU</div>
-    </div>
-    <div class="content" style="padding:12px 16px 14px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:50vh;">
-      <div class="message" style="font-size:22px; line-height:1.2; color:#111; margin:8px 0 12px; font-family:Arial, Helvetica, sans-serif; text-align:center;">
-        <div style="font-weight:900; letter-spacing:2px; animation:bauhausPulse 1.6s ease-in-out infinite;">결정장애ON YOU</div>
-      </div>
-    </div>
-  </section>
 
   <!-- EXIT -->
   <section class="window hidden" id="exitWindow">
@@ -375,30 +451,17 @@
       <span id="appTitle">결정장애ON YOU</span>
     </div>
 
-    <div class="menubar">
-      <span data-nav="home" class="nav-link" style="cursor:pointer;">🏠 Feed</span>
-      <span data-nav="ask" class="nav-link" style="cursor:pointer;">✍️ Ask</span>
-      <span data-nav="my" class="nav-link" style="cursor:pointer;">👤 My</span>
-      <span data-nav="admin" class="nav-link" style="cursor:pointer;">🛠️ Admin</span>
-    </div>
+    <div class="menubar"></div>
 
     <div class="content">
       <!-- HOME -->
       <div id="screen-home">
         <div class="tabs">
-          <button class="btn active" id="sortLatestBtn">사라/마라</button>
-          <button class="btn" id="sortPopularBtn">이것/저것</button>
+          <button class="btn active" id="sortLatestBtn">BUY / PASS</button>
+          <button class="btn" id="sortPopularBtn">THIS / THAT</button>
           <button class="btn" id="refreshFeedBtn">새로고침</button>
         </div>
 
-        <div class="panel">
-          <div class="row-between">
-            <div>
-              <strong id="userLabel">anonymous</strong>
-            </div>
-            <button class="btn" id="goAskBtn">질문쓰기</button>
-          </div>
-        </div>
 
         <div id="homeFeedArea"></div>
       </div>
@@ -410,12 +473,16 @@
           <div class="small">(얼굴/닉네임 등은 노출하지 마세요)</div>
 
           <label class="label" for="questionType">질문 타입</label>
-          <select id="questionType" class="input">
-            <option value="single">사라 vs 마라</option>
-            <option value="compare">이것 vs 저것</option>
+          <div class="type-toggle">
+            <button class="btn type-btn active" data-type="single">BUY vs PASS</button>
+            <button class="btn type-btn" data-type="compare">THIS vs THAT</button>
+          </div>
+          <select id="questionType" class="input" style="display:none;">
+            <option value="single">BUY vs PASS</option>
+            <option value="compare">THIS vs THAT</option>
           </select>
 
-          <label class="label" for="imageInput">이미지 업로드 (이것)</label>
+          <label class="label" for="imageInput">이미지 업로드</label>
           <input id="imageInput" class="input" type="file" accept="image/*">
 
           <div id="compareBlock" style="display:none;">
@@ -423,7 +490,7 @@
             <input id="imageInput2" class="input" type="file" accept="image/*">
           </div>
 
-          <label class="label" for="questionInput">캡션 (최대 60자)</label>
+          <label class="label" for="questionInput">설명 (최대 60자)</label>
           <textarea id="questionInput" class="textarea" maxlength="60" placeholder="예: 결혼식 갈 때 입을 건데 사? 말아?"></textarea>
           <div class="small"><span id="questionCount">0</span> / 60</div>
 
@@ -431,7 +498,7 @@
 
           <div class="home-actions">
             <button class="btn btn-primary" id="submitQuestionBtn">등록</button>
-            <button class="btn" id="resetAskBtn">초기화</button>
+            <button class="btn" id="resetAskBtn">내용삭제</button>
             <button class="btn" id="backHomeFromAskBtn">피드로</button>
           </div>
         </div>
@@ -445,8 +512,9 @@
           <div class="hr"></div>
 
           <div class="row">
-            <span class="badge">내 질문 <span id="myQuestionCount">0</span></span>
-            <span class="badge">내 투표 <span id="myVoteCount">0</span></span>
+            <span class="badge badge-btn" id="btnMyQuestions">내 질문 <span id="myQuestionCount">0</span></span>
+            <span class="badge badge-btn" id="btnMyVotes">내 결정 <span id="myVoteCount">0</span></span>
+            <span class="badge badge-btn" id="btnMyFavs">즐겨찾기 <span id="myFavCount">0</span></span>
           </div>
 
           <div class="hr"></div>
@@ -478,6 +546,21 @@
       <span id="statusText">Ready</span>
       <span id="questionTotalText">Questions: 0</span>
     </div>
+    <div class="bottom-nav" id="bottomNav">
+      <span data-nav="home" class="nav-link active" aria-label="Feed">
+        <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>
+      </span>
+      <span data-nav="ask" class="nav-link" aria-label="Ask">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </span>
+      <div class="nav-center"><span id="centerCycle">BUY</span></div>
+      <span data-nav="my" class="nav-link" aria-label="My">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+      </span>
+      <span data-nav="admin" class="nav-link" aria-label="Admin">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 7v6l4 2"/></svg>
+      </span>
+    </div>
   </section>
 
 </div>
@@ -491,6 +574,7 @@ const STORAGE_KEYS = {
   comments: "answerme_comments_v1",
   reports: "answerme_reports_v1",
   banned: "answerme_banned_v1",
+  favorites: "answerme_favorites_v1",
   shuffled: "answerme_shuffled_v1",
   cleared: "answerme_cleared_v1",
   clearedCompare: "answerme_cleared_compare_v1"
@@ -512,20 +596,47 @@ const maskWords = [
   "섹스","성교","자위","보지","자지","야동","강간","성폭행","음란","창녀","걸레"
 ];
 
+const itemSvg = (label) => `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2f2f2'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23e0e0e0'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>${label}</text></svg>`;
+const compareSvg = (label) => `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f3f3f3'/><text x='50%' y='52%' font-size='30' text-anchor='middle' fill='%23888' font-family='Arial'>${label}</text></svg>`;
+
+const singleTitles = [
+  "샤넬 블랙 퀼팅 체인백","샤넬 베이지 숄더백","샤넬 미니 플랩백","샤넬 체인 지갑백","샤넬 클래식 플랩백",
+  "롤렉스 데이저스트","롤렉스 서브마리너","롤렉스 GMT 마스터","롤렉스 데이토나","롤렉스 익스플로러",
+  "포르쉐 마칸","포르쉐 카이엔","BMW X5","BMW X3","벤츠 GLC",
+  "벤츠 GLE","렉서스 RX","아우디 Q5","아우디 Q7","테슬라 모델 Y",
+  "무신사 미니 블랙 원피스","무신사 롱 슬립 원피스","무신사 니트 원피스","무신사 셔츠 원피스","무신사 플리츠 원피스",
+  "MZ 스트릿 후디 세트","MZ 미니 크로스백","MZ 러닝 스니커즈","MZ 캐주얼 셋업","MZ 레더 자켓",
+  "명품 카드지갑","명품 미니 토트백","명품 선글라스","명품 스카프","명품 로퍼",
+  "MZ 트렌드 러닝화","MZ 컬러 선글라스","MZ 패딩 베스트","MZ 데님 팬츠","MZ 캔버스 토트백",
+  "명품 벨트","명품 반지갑","명품 브레이슬릿","명품 시그니처 향수","명품 캐시미어 머플러",
+  "MZ 미니 카고백","MZ 패턴 가디건","MZ 스웨트 셋업","MZ 톤온톤 셔츠","MZ 테크 팬츠"
+];
+
+const compareTitles = [
+  "샤넬 클래식 플랩 vs 에르메스 켈리","샤넬 보이백 vs 디올 새들백","샤넬 2.55 vs 프라다 호보","에르메스 버킨 vs 루이비통 카퓌신","보테가 베네타 조디 vs 셀린느 트리옹프",
+  "롤렉스 데이토나 vs 오메가 스피드마스터","롤렉스 서브마리너 vs 튜더 블랙베이","롤렉스 GMT 마스터 vs 태그호이어 카레라","롤렉스 데이저스트 vs 까르띠에 탱크","롤렉스 익스플로러 vs IWC 파일럿",
+  "포르쉐 카이엔 vs BMW X5","포르쉐 마칸 vs 벤츠 GLC","BMW X3 vs 아우디 Q5","벤츠 GLE vs 아우디 Q7","렉서스 RX vs 테슬라 모델 Y",
+  "무신사 블랙 미니원피스 vs 화이트 롱원피스","무신사 니트원피스 vs 셔츠원피스","플리츠 원피스 vs 슬립 원피스","미니 원피스 vs 롱 원피스","톤온톤 룩 vs 포인트 컬러 룩",
+  "MZ 러닝화 vs 클래식 스니커즈","후디 셋업 vs 셔츠 셋업","미니 크로스백 vs 버킷백","레더 자켓 vs 테크 자켓","테크 팬츠 vs 와이드 팬츠",
+  "명품 카드지갑 vs 명품 반지갑","명품 미니백 vs 명품 토트백","명품 스니커즈 vs 명품 로퍼","명품 스카프 vs 명품 머플러","명품 향수 vs 명품 뷰티 키트",
+  "MZ 크롭 자켓 vs 오버핏 자켓","MZ 미니백 vs 크로스백","MZ 데님 팬츠 vs 카고 팬츠","MZ 레더 자켓 vs 바시티 자켓","MZ 후디 vs 니트",
+  "샤넬 체인백 vs 에르메스 린디","구찌 마몽 vs 생로랑 카산드라","프라다 리에디션 vs 미우미우 아르카디","셀린느 박스백 vs 로에베 퍼즐",
+  "롤렉스 서브마리너 vs 브라이틀링 내비타이머","오메가 씨마스터 vs 태그호이어 아쿠아레이서","까르띠에 산토스 vs 불가리 옥토",
+  "포르쉐 마칸 vs 아우디 Q5","BMW X5 vs 벤츠 GLE","렉서스 RX vs 아우디 Q7",
+  "무신사 니트 원피스 vs 플리츠 원피스","무신사 셔츠 원피스 vs 롱 원피스","미니 원피스 vs 슬립 원피스",
+  "MZ 테크 팬츠 vs 카고 팬츠","MZ 레이어드 티셔츠 vs 크롭 자켓","MZ 와이드 팬츠 vs 데님 팬츠",
+  "MZ 크로스백 vs 토트백","MZ 후디 vs 후드집업","명품 선글라스 vs 명품 스카프","명품 향수 vs 명품 로션"
+];
+
 const defaultQuestions = [
-  // 사라/마라 예시 10
-  { id: makeId(), type: "single", q: "결혼식 갈 때 입을 건데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2f2f2'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23d9d9d9'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM A</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 100000 },
-  { id: makeId(), type: "single", q: "출근룩으로 무난한데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f7f7f7'/><circle cx='300' cy='360' r='180' fill='%23e0e0e0'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM B</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 99000 },
-  { id: makeId(), type: "single", q: "가격 대비 괜찮아 보이는데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f3f3f3'/><rect x='140' y='160' width='320' height='480' rx='18' fill='%23e6e6e6'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM C</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 98000 },
-  { id: makeId(), type: "single", q: "색감이 튀는데 오히려 괜찮을까? 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f9f1f1'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23f5c2c2'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM D</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 97000 },
-  { id: makeId(), type: "single", q: "나한테 어울릴지 애매한데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2f6ff'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23cfe0ff'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM E</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 96000 },
-  { id: makeId(), type: "single", q: "시즌 끝나기 전에 지를까? 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f6f2ff'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23e2d6ff'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM F</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 95000 },
-  { id: makeId(), type: "single", q: "후기 반반인데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f2fff6'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23d6ffe4'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM G</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 94000 },
-  { id: makeId(), type: "single", q: "유행템이라 고민돼. 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23fff7f0'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23ffd8b5'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM H</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 93000 },
-  { id: makeId(), type: "single", q: "할인 크게 했는데 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f3f3f3'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23e8e8e8'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM I</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 92000 },
-  { id: makeId(), type: "single", q: "대체품이 없어서 고민돼. 사? 말아?", image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='800'><rect width='100%' height='100%' fill='%23f9f9f9'/><rect x='120' y='140' width='360' height='520' rx='24' fill='%23dedede'/><text x='50%' y='52%' font-size='32' text-anchor='middle' fill='%23888' font-family='Arial'>ITEM J</text></svg>", a1: "사라", a2: "마라", v1: 0, v2: 0, author: "demo", createdAt: Date.now() - 91000 },
-
-
+  ...singleTitles.map((title, idx) => ({
+    id: makeId(), type: "single", q: `${title}, 사? 말아?`, image: itemSvg("ITEM"),
+    a1: "사라", a2: "마라", v1: 0, v2: 0, author: "seed", createdAt: Date.now() - (100000 - idx * 1000)
+  })),
+  ...compareTitles.map((title, idx) => ({
+    id: makeId(), type: "compare", q: title, image: compareSvg("THIS"), image2: compareSvg("THAT"),
+    label1: "이것", label2: "저것", a1: "이것", a2: "저것", v1: 0, v2: 0, author: "seed", createdAt: Date.now() - (50000 - idx * 1000)
+  }))
 ];
 
 
@@ -535,6 +646,7 @@ let votes = {};
 let comments = {};
 let reports = {};
 let bannedUsers = {};
+let favorites = {};
 let session = { sort: "latest", currentQueue: [], currentIndex: 0 };
 
 let activeQuestionId = null;
@@ -568,7 +680,6 @@ const questionTotalText = document.getElementById("questionTotalText");
 const sortLatestBtn = document.getElementById("sortLatestBtn");
 const sortPopularBtn = document.getElementById("sortPopularBtn");
 const refreshFeedBtn = document.getElementById("refreshFeedBtn");
-const userLabel = document.getElementById("userLabel");
 const goAskBtn = document.getElementById("goAskBtn");
 const homeFeedArea = document.getElementById("homeFeedArea");
 
@@ -627,6 +738,7 @@ function initData(){
   comments = loadLocal(STORAGE_KEYS.comments, {});
   reports = loadLocal(STORAGE_KEYS.reports, {});
   bannedUsers = loadLocal(STORAGE_KEYS.banned, {});
+  favorites = loadLocal(STORAGE_KEYS.favorites, {});
   session = loadLocal(STORAGE_KEYS.session, {
     sort: "latest",
     currentQueue: [],
@@ -679,6 +791,11 @@ function initData(){
     session = { sort: "latest", currentQueue: [], currentIndex: 0 };
     saveLocal(STORAGE_KEYS.session, session);
   }
+
+  if(typeof favorites !== "object" || favorites === null){
+    favorites = {};
+    saveLocal(STORAGE_KEYS.favorites, favorites);
+  }
 }
 
 function boot(){
@@ -692,35 +809,29 @@ function boot(){
 }
 
 function openSplash(){
-  splashWindow.classList.remove("hidden");
-  welcomeWindow.classList.add("hidden");
-  appWindow.classList.add("hidden");
-  exitWindow.classList.add("hidden");
-  setTimeout(() => {
-    openApp();
-  }, 1200);
+  // splash disabled
+  openApp();
 }
 
 function openWelcome(){
-  splashWindow.classList.add("hidden");
+  if(splashWindow) splashWindow.classList.add("hidden");
   exitWindow.classList.add("hidden");
   welcomeWindow.classList.remove("hidden");
   appWindow.classList.add("hidden");
 }
 
 function openExit(){
-  splashWindow.classList.add("hidden");
+  if(splashWindow) splashWindow.classList.add("hidden");
   welcomeWindow.classList.add("hidden");
   appWindow.classList.add("hidden");
   exitWindow.classList.remove("hidden");
 }
 
 function openApp(){
-  splashWindow.classList.add("hidden");
+  if(splashWindow) splashWindow.classList.add("hidden");
   exitWindow.classList.add("hidden");
   welcomeWindow.classList.add("hidden");
   appWindow.classList.remove("hidden");
-  userLabel.textContent = currentProfile.nickname;
   myNickLabel.textContent = currentProfile.nickname;
   session.currentIndex = 0;
   buildQueueIfNeeded(true);
@@ -772,10 +883,11 @@ function showScreen(name){
   statusText.textContent = name === "home" ? "Feed" : name === "ask" ? "Ask Question" : name === "admin" ? "Admin" : "My";
 
   if(name === "ask"){
-    const choice = prompt("질문 타입 선택\n1) 사라/마라\n2) 이것/저것");
-    const isCompare = choice === "2";
-    questionType.value = isCompare ? "compare" : "single";
-    compareBlock.style.display = isCompare ? "block" : "none";
+    questionType.value = "single";
+    compareBlock.style.display = "none";
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    const first = document.querySelector('.type-btn[data-type="single"]');
+    if(first) first.classList.add('active');
   }
 }
 
@@ -784,10 +896,12 @@ function updateCounts(){
   questionTotalText.textContent = "Questions: " + totalCount;
   const myQuestions = questions.filter(q => q.author === currentProfile.nickname);
   const myVotes = Object.keys(votes).length;
+  const myFavs = Object.keys(favorites || {}).length;
   myQuestionCount.textContent = myQuestions.length;
   myVoteCount.textContent = myVotes;
+  const favEl = document.getElementById("myFavCount");
+  if(favEl) favEl.textContent = myFavs;
   myNickLabel.textContent = currentProfile.nickname;
-  userLabel.textContent = currentProfile.nickname;
 }
 
 function sanitize(text){
@@ -890,6 +1004,11 @@ function saveSession(){
   saveLocal(STORAGE_KEYS.session, session);
 }
 
+function isNewQuestion(q){
+  if(!q || !q.createdAt) return false;
+  return (Date.now() - q.createdAt) < 24 * 60 * 60 * 1000;
+}
+
 function getCurrentQuestion(){
   while(session.currentIndex < session.currentQueue.length){
     const id = session.currentQueue[session.currentIndex];
@@ -937,19 +1056,17 @@ function renderFeed(){
           <div class="thumb-grid">
             <div>
               <img src="${q.image || ''}" alt="item1" style="width:100%; display:block;">
-              <div class="small" style="padding:6px 8px;">${escapeHtml(q.label1 || "이것")}</div>
             </div>
             <div class="vs">VS</div>
             <div>
               <img src="${q.image2 || ''}" alt="item2" style="width:100%; display:block;">
-              <div class="small" style="padding:6px 8px;">${escapeHtml(q.label2 || "저것")}</div>
             </div>
           </div>
         ` : `
           <img src="${q.image || ''}" alt="item" style="width:100%; display:block;" id="mainImage">
         `}
       </div>
-      ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}</p>` : ""}
+      ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}${isNewQuestion(q) ? ' <span class="new-badge">N</span>' : ''}</p>` : ""}
 
       <div id="countdownArea" class="${alreadyVoted ? 'hidden' : ''}" style="margin-top:6px;">
         <div class="progress-shell" id="countdownBar">
@@ -967,27 +1084,34 @@ function renderFeed(){
       </div>
 
       <div class="home-actions" style="margin:6px 0;">
-        <button class="btn btn-danger" id="reportBtn">신고</button>
+        <button class="icon-btn" id="reportBtn" title="신고">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 22v-9M4 4h10l2 3h4v10H6l-2-3H4z"/></svg>
+        </button>
+        <button class="icon-btn" id="commentToggle" title="댓글">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H7l-4 3v-7a4 4 0 0 1-1-3V7a4 4 0 0 1 4-4h11a4 4 0 0 1 4 4z"/></svg>
+        </button>
+        <button class="icon-btn" id="favBtn" title="즐겨찾기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9-8.5C1 9 3 6 6.5 6c2 0 3.4 1 5.5 3 2.1-2 3.5-3 5.5-3C21 6 23 9 21 12.5 19 16.6 12 21 12 21z"/></svg>
+        </button>
         <span class="result-toggle" id="resultToggle">결과 보기</span>
       </div>
       <span id="resultMini" class="muted" style="display:none;"></span>
 
       <div class="vote-bar" id="voteArea">
-        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "이것" : "사라"}</button>
-        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "저것" : "마라"}</button>
+        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
+        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
       </div>
 
-      <span class="comment-toggle" id="commentToggle">댓글 보기</span>
+      <span class="comment-toggle hidden" id="commentToggle">댓글 보기</span>
 
-      <div id="commentArea" class="hidden">
+      <div id="commentArea" class="hidden" style="padding-bottom:8px;">
         <div class="hr"></div>
         <label class="label">한줄 댓글</label>
-        <input id="commentInput" class="input" maxlength="40" placeholder="댓글을 입력하세요">
-        <div class="home-actions">
-          <button class="btn" id="commentSubmitBtn">댓글 등록</button>
-          <button class="btn btn-primary" id="nextBtn">다음 질문</button>
+        <div class="comment-input">
+          <input id="commentInput" maxlength="40" placeholder="댓글을 입력하세요">
+          <button class="comment-send" id="commentSubmitBtn">등록</button>
         </div>
-        <div id="commentList"></div>
+        <div id="commentList" style="margin-top:8px;"></div>
       </div>
     </div>
   `;
@@ -998,6 +1122,7 @@ function renderFeed(){
 
   const vote1Btn = document.getElementById("vote1Btn");
   const vote2Btn = document.getElementById("vote2Btn");
+  const favBtn = document.getElementById("favBtn");
   const resultMini = document.getElementById("resultMini");
   const resultToggle = document.getElementById("resultToggle");
   const commentToggle = document.getElementById("commentToggle");
@@ -1005,6 +1130,7 @@ function renderFeed(){
   const questionCard = document.getElementById("questionCard");
   const writeFromFeedBtn = document.getElementById("writeFromFeedBtn");
   const reportBtn = document.getElementById("reportBtn");
+  const commentArea = document.getElementById("commentArea");
   const commentInput = document.getElementById("commentInput");
   const commentSubmitBtn = document.getElementById("commentSubmitBtn");
   const commentList = document.getElementById("commentList");
@@ -1012,6 +1138,18 @@ function renderFeed(){
   if(writeFromFeedBtn){
     writeFromFeedBtn.addEventListener("click", () => showScreen("ask"));
   }
+
+  if(favBtn){
+    if(favorites[q.id]) favBtn.classList.add("active");
+    favBtn.addEventListener("click", () => {
+      favorites[q.id] = !favorites[q.id];
+      if(!favorites[q.id]) delete favorites[q.id];
+      saveLocal(STORAGE_KEYS.favorites, favorites);
+      favBtn.classList.toggle("active", !!favorites[q.id]);
+      renderMyPage();
+    });
+  }
+
   reportBtn.addEventListener("click", () => {
     reports[q.id] = { reportedAt: Date.now(), question: q };
     saveLocal(STORAGE_KEYS.reports, reports);
@@ -1030,14 +1168,34 @@ function renderFeed(){
   commentToggle.addEventListener("click", () => {
     const on = commentArea.classList.contains("hidden");
     commentArea.classList.toggle("hidden");
-    commentToggle.textContent = on ? "댓글 숨기기" : "댓글 보기";
+    if(on){
+      clearCountdown();
+      setTimeout(() => {
+        commentArea.scrollIntoView({behavior:"smooth", block:"start"});
+      }, 50);
+    }else if(!alreadyVoted){
+      startCountdown(() => {
+        moveNextWithSwipe(questionCard);
+      });
+    }
+  });
+
+  commentInput.addEventListener("focus", () => {
+    clearCountdown();
+  });
+  commentInput.addEventListener("blur", () => {
+    if(!alreadyVoted){
+      startCountdown(() => {
+        moveNextWithSwipe(questionCard);
+      });
+    }
   });
 
   if(alreadyVoted){
     vote1Btn.disabled = true;
     vote2Btn.disabled = true;
     renderComments(q.id, commentList);
-    nextBtn.addEventListener("click", () => moveNextWithSwipe(questionCard));
+    if(nextBtn) nextBtn.addEventListener("click", () => moveNextWithSwipe(questionCard));
   }else{
     canVote = true;
     vote1Btn.disabled = false;
@@ -1063,6 +1221,18 @@ function renderFeed(){
     saveLocal(STORAGE_KEYS.comments, comments);
     commentInput.value = "";
     renderComments(q.id, commentList);
+    if(!alreadyVoted){
+      startCountdown(() => {
+        moveNextWithSwipe(questionCard);
+      });
+    }
+  });
+
+  commentInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      e.preventDefault();
+      commentSubmitBtn.click();
+    }
   });
 
 }
@@ -1189,18 +1359,19 @@ function handleVote(questionId, pick, resultMini, vote1Btn, vote2Btn, nextBtn, c
   renderComments(q.id, commentList);
 
   updateCounts();
+  clearCountdown();
 
   const questionCard = document.getElementById("questionCard");
-  nextBtn.onclick = () => moveNextWithSwipe(questionCard);
-  moveNextWithSwipe(questionCard);
+  if(nextBtn) nextBtn.onclick = () => moveNextWithSwipe(questionCard);
+  moveNextImmediate();
 }
 
 function renderMiniResult(q, container){
   const total = q.v1 + q.v2;
   const p1 = total ? Math.round((q.v1 / total) * 100) : 0;
   const p2 = total ? Math.round((q.v2 / total) * 100) : 0;
-  const labelA = q.type === "compare" ? "이것" : "사라";
-  const labelB = q.type === "compare" ? "저것" : "마라";
+  const labelA = q.type === "compare" ? "THIS" : "BUY";
+  const labelB = q.type === "compare" ? "THAT" : "PASS";
   container.innerHTML = `
     <div class="poll-wrap">
       <span class="poll-label">${labelA}</span>
@@ -1225,6 +1396,12 @@ function moveNextWithSwipe(cardEl){
   }, 280);
 }
 
+function moveNextImmediate(){
+  session.currentIndex += 1;
+  saveSession();
+  renderFeed();
+}
+
 function renderMyPage(){
   updateCounts();
 
@@ -1236,45 +1413,55 @@ function renderMyPage(){
 
   const votedIds = Object.keys(votes);
   const votedQuestions = questions.filter(q => votedIds.includes(q.id));
+  const favIds = Object.keys(favorites || {});
+  const favQuestions = questions.filter(q => favIds.includes(q.id));
 
   myQuestionList.innerHTML = "";
 
-  if(myQuestions.length === 0 && votedQuestions.length === 0){
+  if(myQuestions.length === 0 && votedQuestions.length === 0 && favQuestions.length === 0){
     myQuestionList.innerHTML = `
       <div class="empty-box">
-        아직 작성/투표한 질문이 없습니다.
+        아직 작성/결정/즐겨찾기한 질문이 없습니다.
       </div>
     `;
     return;
   }
 
-  if(myQuestions.length){
-    const myWrap = document.createElement("div");
-    myWrap.className = "card";
-    myWrap.innerHTML = `
-      <div class="row-between" style="margin-bottom:6px;">
-        <span class="badge">내 질문</span>
-        <button class="btn" id="toggleMyList">열기</button>
-      </div>
-      <div id="myList" style="display:none;"></div>
-    `;
-    myQuestionList.appendChild(myWrap);
+  const sections = {
+    my: { title: "내 질문", listId: "myList", toggleId: "toggleMyList", items: myQuestions },
+    voted: { title: "내 결정 목록", listId: "votedList", toggleId: "toggleVotedList", items: votedQuestions },
+    fav: { title: "즐겨찾기 목록", listId: "favList", toggleId: "toggleFavList", items: favQuestions }
+  };
 
-    const myListEl = myWrap.querySelector("#myList");
-    const myBtn = myWrap.querySelector("#toggleMyList");
-    myBtn.addEventListener("click", () => {
-      const open = myListEl.style.display === "block";
-      myListEl.style.display = open ? "none" : "block";
-      myBtn.textContent = open ? "열기" : "닫기";
+  const makeSection = (key) => {
+    const sec = sections[key];
+    if(!sec.items.length) return null;
+    const wrap = document.createElement("div");
+    wrap.className = "card";
+    wrap.id = `section-${key}`;
+    wrap.innerHTML = `
+      <div class="row-between" style="margin-bottom:6px;">
+        <span class="badge">${sec.title}</span>
+        <button class="btn" id="${sec.toggleId}">열기</button>
+      </div>
+      <div id="${sec.listId}" style="display:none;"></div>
+    `;
+    const listEl = wrap.querySelector(`#${sec.listId}`);
+    const btn = wrap.querySelector(`#${sec.toggleId}`);
+    btn.addEventListener("click", () => {
+      const open = listEl.style.display === "block";
+      listEl.style.display = open ? "none" : "block";
+      btn.textContent = open ? "열기" : "닫기";
     });
 
-    myQuestions.forEach(q => {
+    sec.items.forEach(q => {
       const total = q.v1 + q.v2;
       const item = document.createElement("div");
       item.className = "card";
       item.innerHTML = `
         <div class="row-between" style="margin-bottom:6px;">
           <span class="badge">투표 ${total}</span>
+          ${key === "my" ? `<button class="btn btn-danger" data-del="${q.id}">삭제</button>` : ""}
         </div>
         <div class="q-title" style="margin-bottom:6px;">Q. ${escapeHtml(q.q)}</div>
         <div class="muted" style="display:none;">
@@ -1287,54 +1474,45 @@ function renderMyPage(){
         if(!detail) return;
         detail.style.display = (detail.style.display === "none") ? "block" : "none";
       });
-      myListEl.appendChild(item);
+      if(key === "my"){
+        const delBtn = item.querySelector('[data-del]');
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = delBtn.dataset.del;
+          questions = questions.filter(q => q.id !== id);
+          saveLocal(STORAGE_KEYS.questions, questions);
+          renderMyPage();
+        });
+      }
+      listEl.appendChild(item);
     });
-  }
 
-  if(votedQuestions.length){
-    const wrap = document.createElement("div");
-    wrap.className = "card";
-    wrap.innerHTML = `
-      <div class="row-between" style="margin-bottom:6px;">
-        <span class="badge">내 투표 목록</span>
-        <button class="btn" id="toggleVotedList">열기</button>
-      </div>
-      <div id="votedList" style="display:none;"></div>
-    `;
-    myQuestionList.appendChild(wrap);
+    return wrap;
+  };
 
-    const listEl = wrap.querySelector("#votedList");
-    const btn = wrap.querySelector("#toggleVotedList");
-    btn.addEventListener("click", () => {
+  const myWrap = makeSection("my");
+  const votedWrap = makeSection("voted");
+  const favWrap = makeSection("fav");
+  [myWrap, votedWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
+
+  const hookToggle = (btnId, sectionId, listId, toggleId) => {
+    const btn = document.getElementById(btnId);
+    const section = document.getElementById(sectionId);
+    if(!btn || !section) return;
+    btn.onclick = () => {
+      const listEl = section.querySelector(`#${listId}`);
+      const toggleBtn = section.querySelector(`#${toggleId}`);
+      if(!listEl || !toggleBtn) return;
       const open = listEl.style.display === "block";
       listEl.style.display = open ? "none" : "block";
-      btn.textContent = open ? "열기" : "닫기";
-    });
+      toggleBtn.textContent = open ? "열기" : "닫기";
+      section.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+  };
 
-    votedQuestions
-      .sort((a,b) => (b.v1 + b.v2) - (a.v1 + a.v2))
-      .forEach(q => {
-        const total = q.v1 + q.v2;
-        const item = document.createElement("div");
-        item.className = "card";
-        item.innerHTML = `
-          <div class="row-between" style="margin-bottom:6px;">
-            <span class="badge">투표 ${total}</span>
-          </div>
-          <div class="q-title" style="margin-bottom:6px;">Q. ${escapeHtml(q.q)}</div>
-          <div class="muted" style="display:none;">
-            1) ${escapeHtml(q.a1)} (${q.v1})<br>
-            2) ${escapeHtml(q.a2)} (${q.v2})
-          </div>
-        `;
-        item.addEventListener("click", () => {
-          const detail = item.querySelector(".muted");
-          if(!detail) return;
-          detail.style.display = (detail.style.display === "none") ? "block" : "none";
-        });
-        listEl.appendChild(item);
-      });
-  }
+  hookToggle("btnMyQuestions", "section-my", "myList", "toggleMyList");
+  hookToggle("btnMyVotes", "section-voted", "votedList", "toggleVotedList");
+  hookToggle("btnMyFavs", "section-fav", "favList", "toggleFavList");
 }
 
 function renderAdmin(){
@@ -1412,7 +1590,7 @@ function renderComments(qid, container){
   const list = comments[qid] || [];
   container.innerHTML = list.map(c => {
     const text = maskText(escapeHtml(c.text));
-    return `<div class="muted">${escapeHtml(c.author)} : ${text}</div>`;
+    return `<div class="muted"><strong>${escapeHtml(c.author)}</strong> ${text}</div>`;
   }).join("") || "<div class=\"muted\">아직 댓글이 없습니다.</div>";
 }
 
@@ -1492,6 +1670,10 @@ navLinks.forEach(link => {
     if(target === "home") renderFeed();
     if(target === "my") renderMyPage();
     if(target === "admin") renderAdmin();
+
+    document.querySelectorAll('.bottom-nav .nav-link').forEach(n => n.classList.remove('active'));
+    const active = document.querySelector(`.bottom-nav .nav-link[data-nav="${target}"]`);
+    if(active) active.classList.add('active');
   });
 });
 
@@ -1514,7 +1696,9 @@ refreshFeedBtn.addEventListener("click", () => {
   renderFeed();
 });
 
-goAskBtn.addEventListener("click", () => showScreen("ask"));
+if(goAskBtn){
+  goAskBtn.addEventListener("click", () => showScreen("ask"));
+}
 backHomeFromAskBtn.addEventListener("click", () => {
   showScreen("home");
   renderFeed();
@@ -1527,6 +1711,16 @@ questionInput.addEventListener("input", () => {
 questionType.addEventListener("change", () => {
   const isCompare = questionType.value === "compare";
   compareBlock.style.display = isCompare ? "block" : "none";
+});
+
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const type = btn.dataset.type;
+    questionType.value = type;
+    compareBlock.style.display = type === 'compare' ? 'block' : 'none';
+  });
 });
 
 resetAskBtn.addEventListener("click", () => {
@@ -1705,6 +1899,16 @@ resetAllBtn.addEventListener("click", () => {
 
 makeDraggable(welcomeWindow);
 makeDraggable(appWindow);
+
+const cycleWords = ["BUY","PASS","THIS","THAT"];
+let cycleIndex = 0;
+setInterval(() => {
+  const el = document.getElementById("centerCycle");
+  if(!el) return;
+  cycleIndex = (cycleIndex + 1) % cycleWords.length;
+  el.textContent = cycleWords[cycleIndex];
+}, 1000);
+
 boot();
 </script>
 </body>
