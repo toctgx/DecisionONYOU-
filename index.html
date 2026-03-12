@@ -533,7 +533,7 @@
           <div id="myMessage" class="error"></div>
 
           <div class="home-actions">
-            <button class="btn" id="saveProfileEditBtn">프로필 저장</button>
+            <button class="btn" id="saveProfileEditBtn" onclick="alert('닉네임 변경은 월 1회만 가능합니다.')">프로필 저장</button>
           </div>
         </div>
 
@@ -1535,8 +1535,7 @@ function renderMyPage(){
     btn.onclick = () => {
       const listEl = section.querySelector(`#${listId}`);
       if(!listEl) return;
-      const open = listEl.style.display === "block";
-      listEl.style.display = open ? "none" : "block";
+      listEl.style.display = "block";
       section.scrollIntoView({behavior:"smooth", block:"start"});
     };
   };
