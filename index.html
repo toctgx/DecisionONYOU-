@@ -58,10 +58,8 @@
   #homeFeedArea{flex:1; display:flex; flex-direction:column; padding-bottom:12px;}
   .vote-bar{position:sticky; bottom:0; background:var(--win-gray); padding:6px; border-top:1px solid var(--win-dark); display:flex; gap:8px;}
   .result-toggle{margin-left:auto; font-size:12px; cursor:pointer; color:#bfbfbf;}
-  .thumb-grid{display:grid; grid-template-columns:1fr auto 1fr; gap:2px; align-items:center; height:72vh;}
+  .thumb-grid{display:grid; grid-template-columns:1fr auto 1fr; gap:2px; align-items:center;}
   .thumb-grid .vs{font-weight:700; padding:0 6px; color:#bfbfbf;}
-  .thumb-grid > div{height:100%;}
-  .thumb-grid img{width:100%; height:100%; object-fit:cover; aspect-ratio:1/1; display:block;}
   .countdot{display:inline-flex; gap:4px; align-items:center;}
   .countdot span{width:6px; height:6px; border-radius:50%; background:#bbb; display:inline-block;}
   .countdot span.on{background:#222;}
@@ -151,6 +149,11 @@
     font-family:"Apple SD Gothic Neo","Inter","Noto Sans KR",sans-serif;
   }
 
+  .content{
+    padding:2px 4px;
+    max-height:calc(100vh - 100px);
+    overflow:hidden;
+  }
 
   .statusbar{
     display:flex;
@@ -341,18 +344,16 @@
   .consent{display:flex; gap:6px; align-items:flex-start; font-size:12px; margin-top:6px;}
 
   .question-shell{position:relative; min-height:auto; overflow:hidden;}
-  .question-card img{aspect-ratio:1/1; object-fit:cover; width:100%; max-height:72vh; border-radius:8px;}
+  .question-card img{aspect-ratio:1/1; object-fit:cover; width:100%; max-height:60vh; border-radius:8px;}
   @media (max-height:760px){
-    .question-card img{max-height:44vh;}
-    .thumb-grid{height:44vh;}
+    .question-card img{max-height:36vh;}
     .q-title{font-size:15px; margin:4px 0;}
     .btn{min-height:30px; font-size:12px;}
     .statusbar{display:none;}
     .panel{padding:8px; margin-bottom:6px;}
   }
   @media (max-height:680px){
-    .question-card img{max-height:38vh;}
-    .thumb-grid{height:38vh;}
+    .question-card img{max-height:32vh;}
     .q-title{font-size:14px;}
     .tabs{margin-bottom:4px;}
   }
@@ -453,7 +454,7 @@
   </section>
 
   <!-- APP -->
-  <section class="window" id="appWindow">
+  <section class="window hidden" id="appWindow">
     <div class="titlebar">
       <span id="appTitle">결정장애ON YOU</span>
     </div>
@@ -520,6 +521,7 @@
 
           <div class="row">
             <span class="badge badge-btn" id="btnMyQuestions">내 질문 <span id="myQuestionCount">0</span></span>
+            <span class="badge badge-btn" id="btnMyVotes">내 투표현황 <span id="myVoteCount">0</span></span>
             <span class="badge badge-btn" id="btnMyFavs">즐겨찾기 <span id="myFavCount">0</span></span>
           </div>
 
@@ -723,27 +725,8 @@ function loadLocal(key, fallback){
   }
 }
 
-function safeRenderFeed(){
-  try{
-    renderFeed();
-    if(homeFeedArea && homeFeedArea.innerHTML.trim() === ""){
-      questions = [...defaultQuestions];
-      renderFeed();
-    }
-  }catch(e){
-    try{
-      questions = [...defaultQuestions];
-      renderFeed();
-    }catch(_){}
-  }
-}
-
 function saveLocal(key, value){
-  try{
-    localStorage.setItem(key, JSON.stringify(value));
-  }catch(e){
-    // ignore storage errors (e.g., external-file sandbox)
-  }
+  localStorage.setItem(key, JSON.stringify(value));
 }
 
 function shuffleArray(arr){
@@ -867,7 +850,7 @@ function openApp(){
   }
   updateCounts();
   showScreen("home");
-  safeRenderFeed();
+  renderFeed();
   renderMyPage();
 }
 
@@ -1227,7 +1210,7 @@ function renderFeed(){
     vote1Btn.disabled = false;
     vote2Btn.disabled = false;
     startCountdown(() => {
-      moveNextImmediate();
+      moveNextWithSwipe(questionCard);
     });
 
     vote1Btn.addEventListener("click", () => handleVote(q.id, 1, resultMini, vote1Btn, vote2Btn, nextBtn, commentList));
@@ -1362,6 +1345,7 @@ function clearCountdown(){
 
 function startAskCountdown(){
   stopAskCountdown();
+
   askCountdownValue = 60;
   const el = document.getElementById("centerCycle");
   if(el){
@@ -1413,9 +1397,13 @@ function handleVote(questionId, pick, resultMini, vote1Btn, vote2Btn, nextBtn, c
   vote1Btn.disabled = true;
   vote2Btn.disabled = true;
 
+  renderComments(q.id, commentList);
+
   updateCounts();
   clearCountdown();
 
+  const questionCard = document.getElementById("questionCard");
+  if(nextBtn) nextBtn.onclick = () => moveNextWithSwipe(questionCard);
   moveNextImmediate();
 }
 
@@ -1464,15 +1452,17 @@ function renderMyPage(){
     .filter(q => q.author === currentProfile.nickname)
     .sort((a,b) => b.createdAt - a.createdAt);
 
+  const votedIds = Object.keys(votes);
+  const votedQuestions = questions.filter(q => votedIds.includes(q.id));
   const favIds = Object.keys(favorites || {});
   const favQuestions = questions.filter(q => favIds.includes(q.id));
 
   myQuestionList.innerHTML = "";
 
-  if(myQuestions.length === 0 && favQuestions.length === 0){
+  if(myQuestions.length === 0 && votedQuestions.length === 0 && favQuestions.length === 0){
     myQuestionList.innerHTML = `
       <div class="empty-box">
-        아직 작성/즐겨찾기한 질문이 없습니다.
+        아직 작성/결정/즐겨찾기한 질문이 없습니다.
       </div>
     `;
     return;
@@ -1480,6 +1470,7 @@ function renderMyPage(){
 
   const sections = {
     my: { title: "내 질문", listId: "myList", toggleId: "toggleMyList", items: myQuestions },
+    voted: { title: "내 투표현황", listId: "votedList", toggleId: "toggleVotedList", items: votedQuestions },
     fav: { title: "즐겨찾기 목록", listId: "favList", toggleId: "toggleFavList", items: favQuestions }
   };
 
@@ -1535,8 +1526,9 @@ function renderMyPage(){
   };
 
   const myWrap = makeSection("my");
+  const votedWrap = makeSection("voted");
   const favWrap = makeSection("fav");
-  [myWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
+  [myWrap, votedWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
 
   const hookToggle = (btnId, sectionId, listId) => {
     const btn = document.getElementById(btnId);
@@ -1551,6 +1543,7 @@ function renderMyPage(){
   };
 
   hookToggle("btnMyQuestions", "section-my", "myList");
+  hookToggle("btnMyVotes", "section-voted", "votedList");
   hookToggle("btnMyFavs", "section-fav", "favList");
 }
 
@@ -1937,16 +1930,6 @@ function stopCenterCycle(){
 
 startCenterCycle();
 boot();
-
-window.addEventListener('load', () => {
-  try{
-    if(appWindow) appWindow.classList.remove('hidden');
-    showScreen('home');
-    renderFeed();
-  }catch(e){
-    console.error(e);
-  }
-});
 </script>
 </body>
 </html>
