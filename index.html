@@ -208,7 +208,7 @@
   .type-toggle{display:flex; flex-direction:column; gap:8px;}
   .type-btn{width:100%;}
   .type-btn.active{outline:1px solid #8e8e93;}
-  .ask-countdown{margin-top:12px; font-size:20px; font-weight:800; text-align:center; color:#f2f2f2; letter-spacing:.5px;}
+  .ask-countdown{margin-top:16px; font-size:32px; font-weight:900; text-align:center; color:#f2f2f2; letter-spacing:1px;}
 
   .btn{
     appearance:none;
@@ -887,13 +887,11 @@ function showScreen(name){
   statusText.textContent = name === "home" ? "Feed" : name === "ask" ? "Ask Question" : name === "admin" ? "Admin" : "My";
 
   if(name === "ask"){
-    questionType.value = "single";
+    questionType.value = "";
     compareBlock.style.display = "none";
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-    const first = document.querySelector('.type-btn[data-type="single"]');
-    if(first) first.classList.add('active');
     if(questionInput) questionInput.placeholder = '예: 지금 안사면 후회할까?';
-    startAskCountdown();
+    stopAskCountdown();
   } else {
     stopAskCountdown();
   }
