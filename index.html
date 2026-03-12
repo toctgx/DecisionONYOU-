@@ -491,7 +491,7 @@
           </div>
 
           <label class="label" for="questionInput">설명 (최대 60자)</label>
-          <textarea id="questionInput" class="textarea" maxlength="60" placeholder="예: 지금 안사면 후회할까? / 나중에 중고가치 좋은쪽은?"></textarea>
+          <textarea id="questionInput" class="textarea" maxlength="60" placeholder="예: 지금 안사면 후회할까?"></textarea>
           <div class="small"><span id="questionCount">0</span> / 60</div>
 
           <div id="askMessage" class="error"></div>
@@ -888,6 +888,7 @@ function showScreen(name){
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
     const first = document.querySelector('.type-btn[data-type="single"]');
     if(first) first.classList.add('active');
+    if(questionInput) questionInput.placeholder = '예: 지금 안사면 후회할까?';
   }
 }
 
@@ -1720,6 +1721,11 @@ document.querySelectorAll('.type-btn').forEach(btn => {
     const type = btn.dataset.type;
     questionType.value = type;
     compareBlock.style.display = type === 'compare' ? 'block' : 'none';
+    if(questionInput){
+      questionInput.placeholder = type === 'compare'
+        ? '예: 나중에 중고가치 좋은쪽은?'
+        : '예: 지금 안사면 후회할까?';
+    }
   });
 });
 
