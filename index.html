@@ -1899,8 +1899,8 @@ saveProfileEditBtn.addEventListener("click", () => {
     myMessage.textContent = "닉네임에 부적절한 표현이 포함되어 있습니다.";
     return;
   }
+  alert("닉네임 변경은 월 1회만 가능합니다.");
   if(nextNick !== currentProfile.nickname){
-    alert("닉네임 변경은 월 1회만 가능합니다.");
     currentProfile.nickname = nextNick;
     currentProfile.lastNickChangeAt = now;
   }
