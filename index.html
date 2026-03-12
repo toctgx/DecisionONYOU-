@@ -62,6 +62,8 @@
   .thumb-grid .vs{font-weight:700; padding:0 6px; color:#bfbfbf;}
   .thumb-grid > div{height:100%;}
   .thumb-grid img{width:100%; height:100%; object-fit:cover; aspect-ratio:1/1; display:block;}
+  .compare-card{height:60vh;}
+  .single-card img{height:60vh; max-height:60vh; object-fit:cover;}
   .countdot{display:inline-flex; gap:4px; align-items:center;}
   .countdot span{width:6px; height:6px; border-radius:50%; background:#bbb; display:inline-block;}
   .countdot span.on{background:#222;}
@@ -1062,7 +1064,7 @@ function renderFeed(){
   shell.innerHTML = `
     <div class="card question-card" id="questionCard">
 
-      <div class="card" style="background:#fff; padding:0; overflow:hidden;">
+      <div class="card ${q.type === "compare" ? 'compare-card' : 'single-card'}" style="background:#fff; padding:0; overflow:hidden;">
         ${q.type === "compare" ? `
           <div class="thumb-grid">
             <div>
