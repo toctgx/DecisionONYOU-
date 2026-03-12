@@ -1927,6 +1927,16 @@ function stopCenterCycle(){
 
 startCenterCycle();
 boot();
+
+window.addEventListener('load', () => {
+  try{
+    if(appWindow) appWindow.classList.remove('hidden');
+    showScreen('home');
+    renderFeed();
+  }catch(e){
+    console.error(e);
+  }
+});
 </script>
 </body>
 </html>
