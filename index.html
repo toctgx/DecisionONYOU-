@@ -849,7 +849,7 @@ function openApp(){
   }
   updateCounts();
   showScreen("home");
-  renderFeed();
+  safeRenderFeed();
   renderMyPage();
 }
 
@@ -1239,6 +1239,22 @@ function renderFeed(){
     }
   });
 
+}
+
+function safeRenderFeed(){
+  renderFeed();
+  if(homeFeedArea && homeFeedArea.children.length === 0){
+    buildQueueIfNeeded(true);
+    renderFeed();
+  }
+  if(homeFeedArea && homeFeedArea.children.length === 0){
+    questions = [...defaultQuestions];
+    saveLocal(STORAGE_KEYS.questions, questions);
+    session.currentQueue = [];
+    session.currentIndex = 0;
+    buildQueueIfNeeded(true);
+    renderFeed();
+  }
 }
 
 function renderPopular(){
@@ -1694,7 +1710,7 @@ navLinks.forEach(link => {
   link.addEventListener("click", () => {
     const target = link.dataset.nav;
     showScreen(target);
-    if(target === "home") renderFeed();
+    if(target === "home") safeRenderFeed();
     if(target === "my") renderMyPage();
     if(target === "admin") renderAdmin();
 
@@ -1727,7 +1743,7 @@ backHomeFromAskBtn.addEventListener("click", () => {
   const el = document.getElementById("askCountdown");
   if(el) el.textContent = "";
   showScreen("home");
-  renderFeed();
+  safeRenderFeed();
 });
 
 questionInput.addEventListener("input", () => {
