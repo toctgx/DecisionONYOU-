@@ -1098,12 +1098,12 @@ function renderFeed(){
         </button>
         <button class="icon-btn" id="commentToggle" title="댓글달기" style="width:auto; padding:4px 10px; font-size:12px; font-weight:700;">댓글달기</button>
       </div>
-      <span id="resultMini" class="muted" style="display:block;"></span>
-
       <div class="vote-bar" id="voteArea">
         <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
         <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
       </div>
+
+      <span id="resultMini" class="muted" style="display:block; margin:10px 0 6px;"></span>
 
       <span class="comment-toggle hidden" id="commentToggle">댓글 보기</span>
 
