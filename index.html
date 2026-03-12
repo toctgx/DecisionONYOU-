@@ -1096,18 +1096,9 @@ function renderFeed(){
         <button class="icon-btn" id="reportBtn" title="신고" style="width:auto; padding:8px 14px; font-size:13px; font-weight:700;">
           신고
         </button>
-        <button class="icon-btn" id="commentToggle" title="댓글달기" style="width:auto; padding:8px 14px; font-size:13px; font-weight:700;">댓글달기</button>
-      </div>
-      <div class="vote-bar" id="voteArea">
-        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
-        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
       </div>
 
-      <span id="resultMini" class="muted" style="display:block; margin:10px 0 6px;"></span>
-
-      <span class="comment-toggle hidden" id="commentToggle">댓글 보기</span>
-
-      <div id="commentArea" class="hidden" style="padding-bottom:8px;">
+      <div id="commentArea" style="padding-bottom:8px;">
         <div class="hr"></div>
         <label class="label">한줄 댓글</label>
         <div class="comment-input">
@@ -1116,6 +1107,13 @@ function renderFeed(){
         </div>
         <div id="commentList" style="margin-top:8px;"></div>
       </div>
+
+      <div class="vote-bar" id="voteArea">
+        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
+        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
+      </div>
+
+      <span id="resultMini" class="muted" style="display:block; margin:10px 0 6px;"></span>
     </div>
   `;
   homeFeedArea.appendChild(shell);
@@ -1127,7 +1125,6 @@ function renderFeed(){
   const vote2Btn = document.getElementById("vote2Btn");
   const favBtn = document.getElementById("favBtn");
   const resultMini = document.getElementById("resultMini");
-  const commentToggle = document.getElementById("commentToggle");
   const nextBtn = document.getElementById("nextBtn");
   const questionCard = document.getElementById("questionCard");
   const writeFromFeedBtn = document.getElementById("writeFromFeedBtn");
@@ -1161,21 +1158,6 @@ function renderFeed(){
   });
 
   renderMiniResult(q, resultMini);
-
-  commentToggle.addEventListener("click", () => {
-    const on = commentArea.classList.contains("hidden");
-    commentArea.classList.toggle("hidden");
-    if(on){
-      clearCountdown();
-      setTimeout(() => {
-        commentArea.scrollIntoView({behavior:"smooth", block:"start"});
-      }, 50);
-    }else if(!alreadyVoted){
-      startCountdown(() => {
-        moveNextWithSwipe(questionCard);
-      });
-    }
-  });
 
   commentInput.addEventListener("focus", () => {
     clearCountdown();
