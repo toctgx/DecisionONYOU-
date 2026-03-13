@@ -128,34 +128,34 @@
 
   .menubar{display:none;}
   .bottom-nav{
-    position:fixed; bottom:0; left:0; right:0; z-index:5;
+    position:fixed; bottom:14px; left:12px; right:12px; z-index:5;
     display:flex; align-items:center; justify-content:space-between;
-    gap:12px; padding:10px 16px 12px; background:#f3ead7;
-    border-top:none; height:var(--nav-h); box-sizing:border-box;
-    padding-bottom:calc(12px + env(safe-area-inset-bottom));
+    gap:6px; padding:10px 14px; background:#ffffff;
+    border-radius:999px; height:72px; box-sizing:border-box;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
   }
-  .bottom-nav::before{
-    content:""; position:absolute; left:0; right:0; top:4px; height:1px; background:#111111;
-  }
+  .bottom-nav::before{display:none;}
   .bottom-nav .nav-link{
-    flex:1; display:flex; align-items:center; justify-content:center;
-    padding:8px 0; cursor:pointer;
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:4px; padding:6px 0; cursor:pointer;
     background:transparent; border:none; color:#111111;
+    font-size:11px; letter-spacing:.3px;
   }
-  .bottom-nav .nav-link svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:2;}
+  .bottom-nav .nav-link svg{width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2;}
   .bottom-nav .nav-link.active{color:#111111;}
   .nav-center{
     width:54px; height:54px; border-radius:50%;
-    background:#ffffff; border:2px solid #111111;
+    background:#f3f3f3; border:none;
     display:flex; align-items:center; justify-content:center;
-    transform:translateY(-12px);
+    transform:translateY(0);
     overflow:hidden;
   }
   .nav-center span{
-    font-size:15px; font-weight:900; letter-spacing:.3px; color:#0a0a0a; line-height:1;
+    font-size:12px; font-weight:900; letter-spacing:.3px; color:#0a0a0a; line-height:1;
     font-family:"Apple SD Gothic Neo","Inter","Noto Sans KR",sans-serif;
     text-shadow:none;
   }
+  .nav-text{font-size:11px; font-weight:700;}
 
   .content{
     padding:2px 4px calc(var(--nav-h) + 16px);
@@ -572,18 +572,22 @@
       <span id="questionTotalText">Questions: 0</span>
     </div>
     <div class="bottom-nav" id="bottomNav">
-      <span data-nav="home" class="nav-link active" aria-label="Feed">
+      <span data-nav="home" class="nav-link active" aria-label="Home">
         <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>
+        <span class="nav-text">HOME</span>
       </span>
-      <span data-nav="ask" class="nav-link" aria-label="Ask">
+      <span data-nav="ask" class="nav-link" aria-label="질문하기">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="nav-text">ASK</span>
       </span>
       <div class="nav-center"><span id="centerCycle">BUY</span></div>
-      <span data-nav="my" class="nav-link" aria-label="My">
+      <span data-nav="my" class="nav-link" aria-label="마이페이지">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+        <span class="nav-text">MY</span>
       </span>
       <span data-nav="admin" class="nav-link" aria-label="Admin">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 7v6l4 2"/></svg>
+        <span class="nav-text">ADMIN</span>
       </span>
     </div>
   </section>
