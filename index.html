@@ -1642,10 +1642,19 @@ function updateNotifications(){
   const btn = document.getElementById("notifyBtn");
   if(btn && btn.dataset.bound !== "1"){
     btn.dataset.bound = "1";
-    btn.addEventListener("click", () => {
+    btn.style.pointerEvents = "auto";
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       showScreen("notifications");
       renderNotifications();
     });
+    btn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showScreen("notifications");
+      renderNotifications();
+    }, {passive:false});
   }
   if(!dot) return;
   const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
