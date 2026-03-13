@@ -1105,12 +1105,13 @@ function renderFeed(){
           </button>
         </div>
         <span id="resultMini" class="muted" style="display:block; margin:4px 0 8px;"></span>
-        <div id="commentList" style="margin-top:8px;"></div>
-      </div>
 
-      <div class="vote-bar" id="voteArea">
-        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
-        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
+        <div class="vote-bar" id="voteArea">
+          <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
+          <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
+        </div>
+
+        <div id="commentList" style="margin-top:8px;"></div>
       </div>
     </div>
   `;
