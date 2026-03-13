@@ -459,7 +459,7 @@
   <section class="window hidden" id="welcomeWindow">
     <div class="titlebar">
       <span class="title-center">결정장애ON YOU</span>
-      <span class="title-right" aria-label="알림">
+      <span class="title-right" aria-label="알림" id="notifyBtn">
         <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 1 5 5v3.5l1.5 3H5.5l1.5-3V8a5 5 0 0 1 5-5z" stroke="#111" fill="none" stroke-width="2"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="#111" fill="none" stroke-width="2"/></svg>
       </span>
     </div>
@@ -520,7 +520,7 @@
   <section class="window hidden" id="appWindow">
     <div class="titlebar">
       <span class="title-center">결정장애ON YOU</span>
-      <span class="title-right" aria-label="알림">
+      <span class="title-right" aria-label="알림" id="notifyBtn">
         <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 1 5 5v3.5l1.5 3H5.5l1.5-3V8a5 5 0 0 1 5-5z" stroke="#111" fill="none" stroke-width="2"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="#111" fill="none" stroke-width="2"/></svg>
         <span class="notify-dot" id="notifyDot"></span>
       </span>
@@ -613,6 +613,14 @@
           <div class="small">신고된 글은 자동 비공개 처리됩니다.</div>
         </div>
         <div id="adminReportList"></div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div id="screen-notifications" class="hidden">
+        <div class="panel">
+          <div style="font-weight:800;">알림</div>
+        </div>
+        <div id="notificationList"></div>
       </div>
     </div>
 
@@ -782,7 +790,8 @@ const screens = {
   home: document.getElementById("screen-home"),
   ask: document.getElementById("screen-ask"),
   my: document.getElementById("screen-my"),
-  admin: document.getElementById("screen-admin")
+  admin: document.getElementById("screen-admin"),
+  notifications: document.getElementById("screen-notifications")
 };
 
 const navLinks = [...document.querySelectorAll(".nav-link")];
@@ -958,6 +967,7 @@ function openApp(){
   safeRenderFeed();
   renderMyPage();
   updateNotifications();
+  renderNotifications();
 }
 
 function makeDraggable(win){
@@ -993,7 +1003,7 @@ function makeDraggable(win){
 function showScreen(name){
   Object.values(screens).forEach(el => el.classList.add("hidden"));
   screens[name].classList.remove("hidden");
-  statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : "마이페이지";
+  statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : name === "notifications" ? "알림" : "마이페이지";
 
   if(name === "ask"){
     questionType.value = "";
@@ -1633,6 +1643,14 @@ function updateNotifications(){
   const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
   const hasComments = myIds.some(id => (comments[id] || []).length > 0);
   dot.style.display = hasComments ? "block" : "none";
+  const btn = document.getElementById("notifyBtn");
+  if(btn && btn.dataset.bound !== "1"){
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", () => {
+      showScreen("notifications");
+      renderNotifications();
+    });
+  }
 }
 
 function openReportModal(q){
@@ -1665,6 +1683,31 @@ function openReportModal(q){
   modal.style.display = "flex";
 }
 
+
+function renderNotifications(){
+  const wrap = document.getElementById("notificationList");
+  if(!wrap) return;
+  const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
+  const items = [];
+  myIds.forEach(id => {
+    (comments[id] || []).forEach(c => items.push({ id, ...c }));
+  });
+  if(items.length === 0){
+    wrap.innerHTML = `
+      <div class="empty-box">
+        아직 표시할 내용이 없습니다
+        <div class="footer-note">회원님의 콘텐츠에 달린 댓글 알림이 여기 표시됩니다.</div>
+      </div>
+    `;
+    return;
+  }
+  wrap.innerHTML = items.map(c => `
+    <div class="card">
+      <div class="q-title" style="font-size:14px; margin-bottom:6px;">${escapeHtml(c.author)}</div>
+      <div class="muted">${escapeHtml(c.text)}</div>
+    </div>
+  `).join("");
+}
 
 function renderAdmin(){
   adminReportList.innerHTML = "";
@@ -1821,6 +1864,7 @@ navLinks.forEach(link => {
     if(target === "home") safeRenderFeed();
     if(target === "my") renderMyPage();
     if(target === "admin") renderAdmin();
+    if(target === "notifications") renderNotifications();
 
     document.querySelectorAll('.bottom-nav .nav-link').forEach(n => n.classList.remove('active'));
     const active = document.querySelector(`.bottom-nav .nav-link[data-nav="${target}"]`);
