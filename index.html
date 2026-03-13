@@ -520,6 +520,7 @@
 
           <div class="row">
             <span class="badge badge-btn" id="btnMyQuestions">내 질문 <span id="myQuestionCount">0</span></span>
+            <span class="badge badge-btn" id="btnMyVotes">내 투표현황 <span id="myVoteCount">0</span></span>
             <span class="badge badge-btn" id="btnMyFavs">즐겨찾기 <span id="myFavCount">0</span></span>
           </div>
 
@@ -848,7 +849,7 @@ function openApp(){
   }
   updateCounts();
   showScreen("home");
-  renderFeed();
+  safeRenderFeed();
   renderMyPage();
 }
 
@@ -1213,6 +1214,22 @@ function renderFeed(){
 
 }
 
+function safeRenderFeed(){
+  renderFeed();
+  if(homeFeedArea && homeFeedArea.children.length === 0){
+    buildQueueIfNeeded(true);
+    renderFeed();
+  }
+  if(homeFeedArea && homeFeedArea.children.length === 0){
+    questions = [...defaultQuestions];
+    saveLocal(STORAGE_KEYS.questions, questions);
+    session.currentQueue = [];
+    session.currentIndex = 0;
+    buildQueueIfNeeded(true);
+    renderFeed();
+  }
+}
+
 function renderPopular(){
   const list = getSortedQuestions();
   if(list.length === 0){
@@ -1422,15 +1439,17 @@ function renderMyPage(){
     .filter(q => q.author === currentProfile.nickname)
     .sort((a,b) => b.createdAt - a.createdAt);
 
+  const votedIds = Object.keys(votes);
+  const votedQuestions = questions.filter(q => votedIds.includes(q.id));
   const favIds = Object.keys(favorites || {});
   const favQuestions = questions.filter(q => favIds.includes(q.id));
 
   myQuestionList.innerHTML = "";
 
-  if(myQuestions.length === 0 && favQuestions.length === 0){
+  if(myQuestions.length === 0 && votedQuestions.length === 0 && favQuestions.length === 0){
     myQuestionList.innerHTML = `
       <div class="empty-box">
-        아직 작성/즐겨찾기한 질문이 없습니다.
+        아직 작성/결정/즐겨찾기한 질문이 없습니다.
       </div>
     `;
     return;
@@ -1438,6 +1457,7 @@ function renderMyPage(){
 
   const sections = {
     my: { title: "내 질문", listId: "myList", toggleId: "toggleMyList", items: myQuestions },
+    voted: { title: "내 투표현황", listId: "votedList", toggleId: "toggleVotedList", items: votedQuestions },
     fav: { title: "즐겨찾기 목록", listId: "favList", toggleId: "toggleFavList", items: favQuestions }
   };
 
@@ -1493,8 +1513,9 @@ function renderMyPage(){
   };
 
   const myWrap = makeSection("my");
+  const votedWrap = makeSection("voted");
   const favWrap = makeSection("fav");
-  [myWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
+  [myWrap, votedWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
 
   const hookToggle = (btnId, sectionId, listId) => {
     const btn = document.getElementById(btnId);
@@ -1509,6 +1530,7 @@ function renderMyPage(){
   };
 
   hookToggle("btnMyQuestions", "section-my", "myList");
+  hookToggle("btnMyVotes", "section-voted", "votedList");
   hookToggle("btnMyFavs", "section-fav", "favList");
 }
 
@@ -1667,7 +1689,7 @@ navLinks.forEach(link => {
   link.addEventListener("click", () => {
     const target = link.dataset.nav;
     showScreen(target);
-    if(target === "home") renderFeed();
+    if(target === "home") safeRenderFeed();
     if(target === "my") renderMyPage();
     if(target === "admin") renderAdmin();
 
@@ -1700,7 +1722,7 @@ backHomeFromAskBtn.addEventListener("click", () => {
   const el = document.getElementById("askCountdown");
   if(el) el.textContent = "";
   showScreen("home");
-  renderFeed();
+  safeRenderFeed();
 });
 
 questionInput.addEventListener("input", () => {
