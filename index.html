@@ -935,7 +935,7 @@ function makeDraggable(win){
 function showScreen(name){
   Object.values(screens).forEach(el => el.classList.add("hidden"));
   screens[name].classList.remove("hidden");
-  statusText.textContent = name === "home" ? "Feed" : name === "ask" ? "Ask Question" : name === "admin" ? "Admin" : "My";
+  statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : "마이페이지";
 
   if(name === "ask"){
     questionType.value = "";
