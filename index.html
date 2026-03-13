@@ -452,6 +452,15 @@
         <label class="label" for="ageInput">나이</label>
         <input id="ageInput" class="input" type="number" min="18" max="99" placeholder="나이 입력">
 
+        <label class="label" for="mbtiSelect">MBTI (선택)</label>
+        <select id="mbtiSelect" class="input">
+          <option value="">모름/선택안함</option>
+          <option>ISTJ</option><option>ISFJ</option><option>INFJ</option><option>INTJ</option>
+          <option>ISTP</option><option>ISFP</option><option>INFP</option><option>INTP</option>
+          <option>ESTP</option><option>ESFP</option><option>ENFP</option><option>ENTP</option>
+          <option>ESTJ</option><option>ESFJ</option><option>ENFJ</option><option>ENTJ</option>
+        </select>
+        <div class="small">I/E: 내향·외향, S/N: 감각·직관, T/F: 사고·감정, J/P: 판단·인식</div>
 
         <label class="label" for="passwordInput">비밀번호</label>
         <input id="passwordInput" class="input" type="password" maxlength="20" value="1234" placeholder="4자 이상">
@@ -610,7 +619,7 @@ const STORAGE_KEYS = {
 };
 
 
-const TEST_PROFILE = { nickname: "1234", gender: "male", age: 24, region: "Seoul", password: "1234", lastNickChangeAt: 0 };
+const TEST_PROFILE = { nickname: "1234", gender: "male", age: 24, mbti: "", region: "Seoul", password: "1234", lastNickChangeAt: 0 };
 
 const bannedWords = [
   "씨발","시발","병신","좆","존나","개새끼","새끼","미친놈","미친년","꺼져","썅","시발놈",
@@ -692,6 +701,7 @@ const appWindow = document.getElementById("appWindow");
 const nicknameInput = document.getElementById("nicknameInput");
 const genderSelect = document.getElementById("genderSelect");
 const ageInput = document.getElementById("ageInput");
+const mbtiSelect = document.getElementById("mbtiSelect");
 const passwordInput = document.getElementById("passwordInput");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 const enterTestBtn = document.getElementById("enterTestBtn");
@@ -803,6 +813,7 @@ function initData(){
 
   if(!currentProfile.gender) currentProfile.gender = "male";
   if(!currentProfile.age) currentProfile.age = 24;
+  if(!currentProfile.mbti) currentProfile.mbti = "";
   if(!currentProfile.region) currentProfile.region = "Seoul";
   if(!currentProfile.lastNickChangeAt) currentProfile.lastNickChangeAt = 0;
 
@@ -833,6 +844,7 @@ function boot(){
   genderSelect.value = currentProfile.gender || "male";
   ageInput.value = currentProfile.age || "";
   passwordInput.value = currentProfile.password || "1234";
+  if(mbtiSelect) mbtiSelect.value = currentProfile.mbti || "";
 
   openSplash();
 }
@@ -1097,7 +1109,10 @@ function renderFeed(){
           <img src="${q.image || ''}" alt="item" style="width:100%; display:block;" id="mainImage">
         `}
       </div>
-      ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}${isNewQuestion(q) ? ' <span class="new-badge">N</span>' : ''}</p>` : ""}
+      ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}${isNewQuestion(q) ? ' <span class=\"new-badge\">N</span>' : ''}</p>` : ""}
+      <div class="muted" style="margin:4px 0 8px;">
+        ${escapeHtml(q.author || "anonymous")} · ${q.authorAge || "-"} · ${q.authorGender || "-"} · ${q.authorMbti || "-"}
+      </div>
 
       <div id="countdownArea" class="${alreadyVoted ? 'hidden' : ''}" style="margin-top:6px;">
         <div class="progress-shell" id="countdownBar">
@@ -1676,12 +1691,13 @@ saveProfileBtn.addEventListener("click", () => {
   const nick = sanitize(nicknameInput.value);
   const gender = genderSelect.value;
   const age = parseInt(ageInput.value, 10);
+  const mbti = mbtiSelect ? mbtiSelect.value : "";
   const pw = passwordInput.value.trim();
   const err = validateProfile(nick, pw, age, "ok");
   profileMessage.className = "error";
   profileMessage.textContent = err;
   if(err) return;
-  currentProfile = { nickname: nick, gender, age, region: "", password: pw };
+  currentProfile = { nickname: nick, gender, age, mbti, region: "", password: pw };
   saveLocal(STORAGE_KEYS.profile, currentProfile);
 
   if(!loadLocal(STORAGE_KEYS.questions, null)){
@@ -1697,6 +1713,7 @@ enterTestBtn.addEventListener("click", () => {
   nicknameInput.value = "1234";
   genderSelect.value = "male";
   ageInput.value = 24;
+  if(mbtiSelect) mbtiSelect.value = "";
   passwordInput.value = "1234";
   openApp();
 });
@@ -1821,6 +1838,9 @@ submitQuestionBtn.addEventListener("click", () => {
         v1: 0,
         v2: 0,
         author: currentProfile.nickname,
+        authorAge: currentProfile.age || "-",
+        authorGender: currentProfile.gender === "male" ? "남" : currentProfile.gender === "female" ? "여" : "-",
+        authorMbti: currentProfile.mbti || "-",
         createdAt: Date.now()
       };
       questions.push(newQuestion);
@@ -1858,6 +1878,9 @@ submitQuestionBtn.addEventListener("click", () => {
         v1: 0,
         v2: 0,
         author: currentProfile.nickname,
+        authorAge: currentProfile.age || "-",
+        authorGender: currentProfile.gender === "male" ? "남" : currentProfile.gender === "female" ? "여" : "-",
+        authorMbti: currentProfile.mbti || "-",
         createdAt: Date.now()
       };
 
