@@ -1355,7 +1355,7 @@ function startAskCountdown(){
   askCountdownValue = 60;
   const el = document.getElementById("centerCycle");
   if(el){
-    el.style.color = "#f2f2f2";
+    el.style.color = "#0a0a0a";
     el.textContent = askCountdownValue;
   }
   stopCenterCycle();
@@ -1375,7 +1375,7 @@ function stopAskCountdown(){
   }
   const el = document.getElementById("centerCycle");
   if(el){
-    el.style.color = "#f2f2f2";
+    el.style.color = "#0a0a0a";
     el.textContent = cycleWords[cycleIndex];
   }
   startCenterCycle();
@@ -1917,7 +1917,7 @@ let centerCycleTimer = null;
 function startCenterCycle(){
   const el = document.getElementById("centerCycle");
   if(!el) return;
-  el.style.color = "#f2f2f2";
+  el.style.color = "#0a0a0a";
   if(centerCycleTimer) return;
   centerCycleTimer = setInterval(() => {
     cycleIndex = (cycleIndex + 1) % cycleWords.length;
