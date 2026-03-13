@@ -467,6 +467,11 @@
 
         <div id="profileMessage" class="error"></div>
 
+        <div class="consent">
+          <input type="checkbox" id="consentCheck">
+          <label for="consentCheck">법적으로 문제가 되는 이미지(불법·불쾌·차별·혐오·성적 콘텐츠)는 업로드하지 않겠습니다.</label>
+        </div>
+
         <div class="home-actions">
           <button class="btn btn-primary" id="saveProfileBtn">확인</button>
           <button class="btn" id="enterTestBtn">테스트 계정으로 시작</button>
@@ -706,6 +711,7 @@ const passwordInput = document.getElementById("passwordInput");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 const enterTestBtn = document.getElementById("enterTestBtn");
 const profileMessage = document.getElementById("profileMessage");
+const consentCheck = document.getElementById("consentCheck");
 
 const screens = {
   home: document.getElementById("screen-home"),
@@ -996,7 +1002,7 @@ function validateProfile(nick, pw, age, region){
 function validateQuestion(q){
   if(q && q.length > 60) return "캡션은 60자 이하만 가능합니다.";
   if(q && containsBannedWord(q)){
-    return "캡션에 부적절한 표현이 포함되어 있습니다.";
+    return "정치/성적/차별 관련 표현은 사용할 수 없습니다.";
   }
   return "";
 }
@@ -1688,6 +1694,11 @@ function enableSwipe(cardEl, onSwipe){
 }
 
 saveProfileBtn.addEventListener("click", () => {
+  if(consentCheck && !consentCheck.checked){
+    profileMessage.className = "error";
+    profileMessage.textContent = "동의 후에만 시작할 수 있습니다.";
+    return;
+  }
   const nick = sanitize(nicknameInput.value);
   const gender = genderSelect.value;
   const age = parseInt(ageInput.value, 10);
@@ -1708,6 +1719,11 @@ saveProfileBtn.addEventListener("click", () => {
 });
 
 enterTestBtn.addEventListener("click", () => {
+  if(consentCheck && !consentCheck.checked){
+    profileMessage.className = "error";
+    profileMessage.textContent = "동의 후에만 시작할 수 있습니다.";
+    return;
+  }
   currentProfile = {...TEST_PROFILE};
   saveLocal(STORAGE_KEYS.profile, currentProfile);
   nicknameInput.value = "1234";
@@ -1809,6 +1825,11 @@ submitQuestionBtn.addEventListener("click", () => {
   if(!imageInput.files || imageInput.files.length === 0){
     askMessage.className = "error";
     askMessage.textContent = "1번 이미지를 업로드해주세요.";
+    return;
+  }
+  if(containsBannedWord(q)){
+    askMessage.className = "error";
+    askMessage.textContent = "정치/성적/차별 이슈가 될 수 있는 내용은 등록할 수 없습니다.";
     return;
   }
   if(isCompare){
