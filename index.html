@@ -150,7 +150,7 @@
   }
 
   .content{
-    padding:2px 4px;
+    padding:2px 4px calc(var(--nav-h) + 16px);
     max-height:calc(100vh - 100px);
     overflow:hidden;
   }
@@ -275,7 +275,7 @@
   .hr{border-top:1px solid var(--win-dark); margin:10px 0;}
 
   .option-btn{flex:1; margin:0; text-align:center;}
-  #voteArea{display:flex; gap:8px; margin:6px 0;}
+  #voteArea{display:flex; gap:8px; margin:6px 0 12px;}
 
   .progress-shell{
     width:100%;
@@ -1107,7 +1107,7 @@ function renderFeed(){
         <div id="commentList" style="margin-top:8px;"></div>
       </div>
 
-      <span id="resultMini" class="muted" style="display:block; margin:6px 0 8px;"></span>
+      <span id="resultMini" class="muted" style="display:block; margin:6px 0 16px;"></span>
 
       <div class="vote-bar" id="voteArea">
         <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
