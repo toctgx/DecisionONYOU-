@@ -1189,10 +1189,6 @@ function renderFeed(){
       </div>
 
       <div id="commentArea" style="padding-bottom:2px;">
-        <div class="comment-input">
-          <input id="commentInput" maxlength="40" placeholder="">
-          <button class="comment-send" id="commentSubmitBtn">등록</button>
-        </div>
         <span id="resultMini" class="muted" style="display:block; margin:4px 0 8px;"></span>
 
         <div class="vote-bar" id="voteArea">
@@ -1219,8 +1215,6 @@ function renderFeed(){
   const reportIcon = document.getElementById("reportIcon");
   const commentIcon = document.getElementById("commentIcon");
   const commentArea = document.getElementById("commentArea");
-  const commentInput = document.getElementById("commentInput");
-  const commentSubmitBtn = document.getElementById("commentSubmitBtn");
   const commentList = document.getElementById("commentList");
 
   if(writeFromFeedBtn){
@@ -1251,17 +1245,6 @@ function renderFeed(){
 
   renderMiniResult(q, resultMini);
 
-  commentInput.addEventListener("focus", () => {
-    clearCountdown();
-  });
-  commentInput.addEventListener("blur", () => {
-    if(!alreadyVoted){
-      startCountdown(() => {
-        moveNextWithSwipe(questionCard);
-      });
-    }
-  });
-
   if(alreadyVoted){
     vote1Btn.disabled = true;
     vote2Btn.disabled = true;
@@ -1278,34 +1261,6 @@ function renderFeed(){
     vote1Btn.addEventListener("click", () => handleVote(q.id, 1, resultMini, vote1Btn, vote2Btn, nextBtn, commentList));
     vote2Btn.addEventListener("click", () => handleVote(q.id, 2, resultMini, vote1Btn, vote2Btn, nextBtn, commentList));
   }
-
-  commentSubmitBtn.addEventListener("click", () => {
-    const text = sanitize(commentInput.value);
-    if(!text) return;
-    if(containsBannedWord(text)){
-      statusText.textContent = "부적절한 표현이 포함되어 있습니다.";
-      return;
-    }
-    const list = comments[q.id] || [];
-    list.unshift({ text, author: currentProfile.nickname, createdAt: Date.now() });
-    comments[q.id] = list.slice(0, 20);
-    saveLocal(STORAGE_KEYS.comments, comments);
-    commentInput.value = "";
-    renderComments(q.id, commentList);
-    updateNotifications();
-    if(!alreadyVoted){
-      startCountdown(() => {
-        moveNextWithSwipe(questionCard);
-      });
-    }
-  });
-
-  commentInput.addEventListener("keydown", (e) => {
-    if(e.key === "Enter"){
-      e.preventDefault();
-      commentSubmitBtn.click();
-    }
-  });
 
 }
 
