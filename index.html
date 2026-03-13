@@ -445,12 +445,11 @@
         <div class="welcome-note" style="border:2px dashed #6a6a6a; padding:10px; background:#f7f7f7;">
           <div style="font-weight:700; margin-bottom:6px;">WELCOME</div>
           회원가입 없이 사용할 수 있습니다.<br>
-          기본 테스트 계정이 자동 입력되어 있습니다.<br><br>
-          <strong>테스트 닉네임: 1234</strong><br><strong>테스트 비밀번호: 1234</strong>
+          아래 정보를 입력하고 시작하세요.
         </div>
 
         <label class="label" for="nicknameInput">닉네임</label>
-        <input id="nicknameInput" class="input" maxlength="12" value="1234" placeholder="2~12자">
+        <input id="nicknameInput" class="input" maxlength="12" value="" placeholder="2~12자">
 
         <label class="label" for="genderSelect">성별</label>
         <select id="genderSelect" class="input">
@@ -472,7 +471,7 @@
         <div class="small">I/E: 내향·외향, S/N: 감각·직관, T/F: 사고·감정, J/P: 판단·인식</div>
 
         <label class="label" for="passwordInput">비밀번호</label>
-        <input id="passwordInput" class="input" type="password" maxlength="20" value="1234" placeholder="4자 이상">
+        <input id="passwordInput" class="input" type="password" maxlength="20" value="" placeholder="4자 이상">
 
         <div id="profileMessage" class="error"></div>
 
@@ -483,7 +482,6 @@
 
         <div class="home-actions">
           <button class="btn btn-primary" id="saveProfileBtn">확인</button>
-          <button class="btn" id="enterTestBtn">테스트 계정으로 시작</button>
         </div>
       </div>
     </div>
@@ -637,7 +635,7 @@ const STORAGE_KEYS = {
 };
 
 
-const TEST_PROFILE = { nickname: "1234", gender: "male", age: 24, mbti: "", region: "Seoul", password: "1234", lastNickChangeAt: 0 };
+const TEST_PROFILE = { nickname: "", gender: "male", age: 0, mbti: "", region: "Seoul", password: "", lastNickChangeAt: 0 };
 
 const bannedWords = [
   "씨발","시발","병신","좆","존나","개새끼","새끼","미친놈","미친년","꺼져","썅","시발놈",
@@ -722,7 +720,6 @@ const ageInput = document.getElementById("ageInput");
 const mbtiSelect = document.getElementById("mbtiSelect");
 const passwordInput = document.getElementById("passwordInput");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
-const enterTestBtn = document.getElementById("enterTestBtn");
 const profileMessage = document.getElementById("profileMessage");
 const consentCheck = document.getElementById("consentCheck");
 
@@ -859,10 +856,10 @@ function initData(){
 
 function boot(){
   initData();
-  nicknameInput.value = currentProfile.nickname || "1234";
+  nicknameInput.value = currentProfile.nickname || "";
   genderSelect.value = currentProfile.gender || "male";
   ageInput.value = currentProfile.age || "";
-  passwordInput.value = currentProfile.password || "1234";
+  passwordInput.value = currentProfile.password || "";
   if(mbtiSelect) mbtiSelect.value = currentProfile.mbti || "";
 
   openSplash();
@@ -1742,21 +1739,6 @@ saveProfileBtn.addEventListener("click", () => {
   openApp();
 });
 
-enterTestBtn.addEventListener("click", () => {
-  if(consentCheck && !consentCheck.checked){
-    profileMessage.className = "error";
-    profileMessage.textContent = "동의 후에만 시작할 수 있습니다.";
-    return;
-  }
-  currentProfile = {...TEST_PROFILE};
-  saveLocal(STORAGE_KEYS.profile, currentProfile);
-  nicknameInput.value = "1234";
-  genderSelect.value = "male";
-  ageInput.value = 24;
-  if(mbtiSelect) mbtiSelect.value = "";
-  passwordInput.value = "1234";
-  openApp();
-});
 
 if(saveProfileEditBtn){
   saveProfileEditBtn.onclick = () => alert("닉네임 변경은 월 1회만 가능합니다.");
