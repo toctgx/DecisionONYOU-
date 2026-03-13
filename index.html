@@ -1098,6 +1098,13 @@ function renderFeed(){
         </button>
       </div>
 
+      <span id="resultMini" class="muted" style="display:block; margin:6px 0 8px;"></span>
+
+      <div class="vote-bar" id="voteArea">
+        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
+        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
+      </div>
+
       <div id="commentArea" style="padding-bottom:2px;">
         <div class="hr"></div>
         <label class="label">한줄 댓글</label>
@@ -1107,13 +1114,6 @@ function renderFeed(){
         </div>
         <div id="commentList" style="margin-top:8px;"></div>
       </div>
-
-      <div class="vote-bar" id="voteArea">
-        <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
-        <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
-      </div>
-
-      <span id="resultMini" class="muted" style="display:block; margin:10px 0 6px;"></span>
     </div>
   `;
   homeFeedArea.appendChild(shell);
