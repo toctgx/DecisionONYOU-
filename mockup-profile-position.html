@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>프로필 표시 위치 목업 (A/B/C)</title>
+  <style>
+    body{margin:0;background:#fdfaf3;color:#111;font-family:Inter,system-ui,-apple-system,sans-serif;}
+    .wrap{padding:16px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+    .card{background:#fff;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.08);padding:12px;display:flex;flex-direction:column;gap:10px;}
+    .title{font-weight:800;font-size:16px;}
+    .meta{font-size:12px;background:#f3ead7;padding:6px 8px;border-radius:10px;display:inline-flex;gap:6px;flex-wrap:wrap;}
+    .img{height:140px;background:#e9e2d1;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#777;font-size:12px;}
+    .vote{display:flex;gap:8px;}
+    .btn{flex:1;background:#2f7bff;color:#fff;border-radius:12px;padding:10px 0;text-align:center;font-weight:800;}
+    .btn.pass{background:#ff3b3b;}
+    .label{font-size:11px;color:#666;font-weight:700;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- A -->
+    <div class="card">
+      <div class="label">A) 질문 제목 바로 아래</div>
+      <div class="title">이거 사 말아?</div>
+      <div class="meta">닉네임 · 24 · 남 · INFP</div>
+      <div class="img">IMAGE</div>
+      <div class="vote">
+        <div class="btn">BUY</div>
+        <div class="btn pass">PASS</div>
+      </div>
+    </div>
+
+    <!-- B -->
+    <div class="card">
+      <div class="label">B) 이미지 아래 (투표 위)</div>
+      <div class="title">이거 사 말아?</div>
+      <div class="img">IMAGE</div>
+      <div class="meta">닉네임 · 24 · 남 · INFP</div>
+      <div class="vote">
+        <div class="btn">BUY</div>
+        <div class="btn pass">PASS</div>
+      </div>
+    </div>
+
+    <!-- C -->
+    <div class="card">
+      <div class="label">C) 투표 버튼 아래</div>
+      <div class="title">이거 사 말아?</div>
+      <div class="img">IMAGE</div>
+      <div class="vote">
+        <div class="btn">BUY</div>
+        <div class="btn pass">PASS</div>
+      </div>
+      <div class="meta">닉네임 · 24 · 남 · INFP</div>
+    </div>
+  </div>
+</body>
+</html>
