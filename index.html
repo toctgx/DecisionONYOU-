@@ -87,13 +87,18 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:12px 14px;
+    padding:10px 14px;
     font-size:13px;
     font-weight:800;
     letter-spacing:.6px;
     user-select:none;
     border-bottom:none;
+    gap:8px;
   }
+  .title-left{font-size:12px; font-weight:700; color:#333;}
+  .title-center{flex:1; text-align:center; font-weight:900; letter-spacing:.8px;}
+  .title-right{position:relative; width:28px; height:28px; display:flex; align-items:center; justify-content:center;}
+  .notify-dot{position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:50%; background:#ff3b3b; display:none;}
   #splashWindow .titlebar{display:none;}
   @keyframes bauhausPulse{0%{letter-spacing:1px; transform:translateY(0);}50%{letter-spacing:2px; transform:translateY(-2px);}100%{letter-spacing:1px; transform:translateY(0);}}
   .splash-logo{font-family:'Noto Sans KR', Arial, sans-serif; font-weight:900; text-align:center; line-height:1.1;}
@@ -428,7 +433,11 @@
   <!-- WELCOME / PROFILE -->
   <section class="window hidden" id="welcomeWindow">
     <div class="titlebar">
-      <span>결정장애ON YOU</span>
+      <span class="title-left">현재위치</span>
+      <span class="title-center">결정장애ON YOU</span>
+      <span class="title-right" aria-label="알림">
+        <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 1 5 5v3.5l1.5 3H5.5l1.5-3V8a5 5 0 0 1 5-5z" stroke="#111" fill="none" stroke-width="2"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="#111" fill="none" stroke-width="2"/></svg>
+      </span>
     </div>
 
     <div class="content">
@@ -488,7 +497,12 @@
   <!-- APP -->
   <section class="window hidden" id="appWindow">
     <div class="titlebar">
-      <span id="appTitle">결정장애ON YOU</span>
+      <span class="title-left" id="locationLabel">현재위치</span>
+      <span class="title-center">결정장애ON YOU</span>
+      <span class="title-right" aria-label="알림">
+        <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 1 5 5v3.5l1.5 3H5.5l1.5-3V8a5 5 0 0 1 5-5z" stroke="#111" fill="none" stroke-width="2"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="#111" fill="none" stroke-width="2"/></svg>
+        <span class="notify-dot" id="notifyDot"></span>
+      </span>
     </div>
 
     <div class="menubar"></div>
@@ -892,6 +906,7 @@ function openApp(){
   showScreen("home");
   safeRenderFeed();
   renderMyPage();
+  updateNotifications();
 }
 
 function makeDraggable(win){
@@ -928,6 +943,10 @@ function showScreen(name){
   Object.values(screens).forEach(el => el.classList.add("hidden"));
   screens[name].classList.remove("hidden");
   statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : "마이페이지";
+  const locationLabel = document.getElementById("locationLabel");
+  if(locationLabel){
+    locationLabel.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : "마이페이지";
+  }
 
   if(name === "ask"){
     questionType.value = "";
@@ -1242,6 +1261,7 @@ function renderFeed(){
     saveLocal(STORAGE_KEYS.comments, comments);
     commentInput.value = "";
     renderComments(q.id, commentList);
+    updateNotifications();
     if(!alreadyVoted){
       startCountdown(() => {
         moveNextWithSwipe(questionCard);
@@ -1573,6 +1593,14 @@ function renderMyPage(){
 
   hookToggle("btnMyQuestions", "section-my", "myList");
   hookToggle("btnMyFavs", "section-fav", "favList");
+}
+
+function updateNotifications(){
+  const dot = document.getElementById("notifyDot");
+  if(!dot) return;
+  const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
+  const hasComments = myIds.some(id => (comments[id] || []).length > 0);
+  dot.style.display = hasComments ? "block" : "none";
 }
 
 function renderAdmin(){
