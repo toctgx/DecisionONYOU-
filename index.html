@@ -341,13 +341,26 @@
   .center{text-align:center;}
 
   .welcome-note{line-height:1.5; font-size:13px;}
-  .home-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; margin-bottom:16px;}
+  .home-actions{display:flex; gap:14px; align-items:center; margin:10px 0 6px;}
   .home-actions .icon-btn{
     border:none;
-    border-radius:12px;
-    background:#111111;
+    border-radius:0;
+    background:transparent;
     box-shadow:none;
+    padding:0;
+    width:24px; height:24px;
   }
+  .modal{
+    position:fixed; inset:0; background:rgba(0,0,0,.4);
+    display:none; align-items:center; justify-content:center; z-index:50;
+  }
+  .modal .modal-card{
+    background:#fff; color:#111; border-radius:14px; padding:16px; width:min(90vw,360px);
+  }
+  .modal .reason{display:block; width:100%; text-align:left; padding:10px 12px; border:1px solid #111; border-radius:10px; background:#fff; margin:8px 0;}
+  .modal .reason.active{background:#f3ead7;}
+  .modal .modal-actions{display:flex; gap:8px; margin-top:12px;}
+  .modal .modal-actions .btn{flex:1;}
 
   .comment-input{
     display:flex; align-items:center; gap:8px;
@@ -617,6 +630,23 @@
     </div>
   </section>
 
+</div>
+
+<div class="modal" id="reportModal">
+  <div class="modal-card">
+    <div style="font-weight:800; margin-bottom:8px;">신고 사유 선택</div>
+    <div id="reportReasons">
+      <button class="reason" data-reason="스팸/광고">스팸/광고</button>
+      <button class="reason" data-reason="혐오/차별">혐오/차별</button>
+      <button class="reason" data-reason="성적/불쾌">성적/불쾌</button>
+      <button class="reason" data-reason="폭력/불법">폭력/불법</button>
+      <button class="reason" data-reason="기타">기타</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="reportCancel">취소</button>
+      <button class="btn" id="reportConfirm">신고</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1130,7 +1160,15 @@ function renderFeed(){
           <img src="${q.image || ''}" alt="item" style="width:100%; display:block;" id="mainImage">
         `}
       </div>
-      ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}${isNewQuestion(q) ? ' <span class=\"new-badge\">N</span>' : ''}</p>` : ""}
+      <div class="home-actions">
+        <button class="icon-btn" id="commentIcon" title="댓글">
+          <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H7l-4 3v-7a4 4 0 0 1-1-3V7a4 4 0 0 1 4-4h11a4 4 0 0 1 4 4z" stroke="#111" fill="none" stroke-width="2"/></svg>
+        </button>
+        <button class="icon-btn" id="reportIcon" title="신고">
+          <svg viewBox="0 0 24 24"><path d="M4 22v-9M4 4h10l2 3h4v10H6l-2-3H4z" stroke="#111" fill="none" stroke-width="2"/></svg>
+        </button>
+      </div>
+      ${q.q ? `<p class="q-title" style="margin-top:6px;">${escapeHtml(maskText(q.q))}${isNewQuestion(q) ? ' <span class=\"new-badge\">N</span>' : ''}</p>` : ""}
       <div class="muted" style="margin:4px 0 8px;">
         ${escapeHtml(authorName)} · ${authorAge} · ${authorGender} · ${authorMbti}
       </div>
@@ -1151,15 +1189,9 @@ function renderFeed(){
       </div>
 
       <div id="commentArea" style="padding-bottom:2px;">
-        <div class="hr"></div>
         <div class="comment-input">
           <input id="commentInput" maxlength="40" placeholder="댓글을 입력하세요">
           <button class="comment-send" id="commentSubmitBtn">등록</button>
-        </div>
-        <div class="home-actions" style="margin:6px 0;">
-          <button class="icon-btn" id="reportBtn" title="신고" style="width:auto; padding:8px 14px; font-size:13px; font-weight:700;">
-            신고
-          </button>
         </div>
         <span id="resultMini" class="muted" style="display:block; margin:4px 0 8px;"></span>
 
@@ -1168,7 +1200,7 @@ function renderFeed(){
           <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
         </div>
 
-        <div id="commentList" style="margin-top:8px;"></div>
+        <div id="commentList" style="margin-top:8px; display:none;"></div>
       </div>
     </div>
   `;
@@ -1184,7 +1216,8 @@ function renderFeed(){
   const nextBtn = document.getElementById("nextBtn");
   const questionCard = document.getElementById("questionCard");
   const writeFromFeedBtn = document.getElementById("writeFromFeedBtn");
-  const reportBtn = document.getElementById("reportBtn");
+  const reportIcon = document.getElementById("reportIcon");
+  const commentIcon = document.getElementById("commentIcon");
   const commentArea = document.getElementById("commentArea");
   const commentInput = document.getElementById("commentInput");
   const commentSubmitBtn = document.getElementById("commentSubmitBtn");
@@ -1205,13 +1238,16 @@ function renderFeed(){
     });
   }
 
-  reportBtn.addEventListener("click", () => {
-    reports[q.id] = { reportedAt: Date.now(), question: q };
-    saveLocal(STORAGE_KEYS.reports, reports);
-    statusText.textContent = "신고가 접수되었습니다.";
-    moveNextWithSwipe(questionCard);
-    renderAdmin();
-  });
+  if(reportIcon){
+    reportIcon.addEventListener("click", () => openReportModal(q));
+  }
+  if(commentIcon){
+    commentIcon.addEventListener("click", () => {
+      const isHidden = commentList.style.display === "none";
+      commentList.style.display = isHidden ? "block" : "none";
+      if(isHidden) renderComments(q.id, commentList);
+    });
+  }
 
   renderMiniResult(q, resultMini);
 
@@ -1596,6 +1632,36 @@ function updateNotifications(){
   const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
   const hasComments = myIds.some(id => (comments[id] || []).length > 0);
   dot.style.display = hasComments ? "block" : "none";
+}
+
+function openReportModal(q){
+  const modal = document.getElementById("reportModal");
+  const list = document.getElementById("reportReasons");
+  const confirmBtn = document.getElementById("reportConfirm");
+  const cancelBtn = document.getElementById("reportCancel");
+  if(!modal || !list || !confirmBtn || !cancelBtn) return;
+  let selected = "";
+  list.querySelectorAll('.reason').forEach(btn => {
+    btn.classList.remove('active');
+    btn.onclick = () => {
+      list.querySelectorAll('.reason').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selected = btn.dataset.reason;
+    };
+  });
+  confirmBtn.onclick = () => {
+    if(!selected){
+      alert("신고 사유를 선택해주세요.");
+      return;
+    }
+    reports[q.id] = { reportedAt: Date.now(), reason: selected, question: q };
+    saveLocal(STORAGE_KEYS.reports, reports);
+    statusText.textContent = "신고가 접수되었습니다.";
+    modal.style.display = "none";
+    renderAdmin();
+  };
+  cancelBtn.onclick = () => { modal.style.display = "none"; };
+  modal.style.display = "flex";
 }
 
 
