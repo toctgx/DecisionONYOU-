@@ -271,6 +271,25 @@
     font-family:inherit;
     font-weight:700;
   }
+  .buy-eye{
+    display:inline-flex;
+    align-items:center;
+    gap:3px;
+    margin-left:6px;
+  }
+  .buy-eye span{
+    width:8px; height:8px; border-radius:50%;
+    background:#ffffff;
+    box-shadow:0 0 6px rgba(255,255,255,.5);
+  }
+  .buy-eye span::after{
+    content:"";
+    display:block;
+    width:4px; height:4px;
+    border-radius:50%;
+    background:#000;
+    margin:2px;
+  }
   .tabs .btn{min-height:40px; font-size:14px;}
   .tabs .btn:nth-child(1){background:#1a1a1a;}
   .tabs .btn:nth-child(2){background:#1a1a1a;}
@@ -1156,7 +1175,7 @@ function renderFeed(){
         <span id="resultMini" class="muted" style="display:block; margin:4px 0 8px;"></span>
 
         <div class="vote-bar" id="voteArea">
-          <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY"}</button>
+          <button class="btn option-btn" id="vote1Btn">${q.type === "compare" ? "THIS" : "BUY <span class=\"buy-eye\"><span></span><span></span></span>"}</button>
           <button class="btn option-btn" id="vote2Btn">${q.type === "compare" ? "THAT" : "PASS"}</button>
         </div>
 
