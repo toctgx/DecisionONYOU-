@@ -355,12 +355,23 @@
     display:none; align-items:center; justify-content:center; z-index:50;
   }
   .modal .modal-card{
-    background:#fff; color:#111; border-radius:14px; padding:16px; width:min(90vw,360px);
+    background:#fff; color:#111; border-radius:14px; padding:16px; width:min(92vw,420px);
   }
   .modal .reason{display:block; width:100%; text-align:left; padding:10px 12px; border:1px solid #111; border-radius:10px; background:#fff; margin:8px 0;}
   .modal .reason.active{background:#f3ead7;}
   .modal .modal-actions{display:flex; gap:8px; margin-top:12px;}
   .modal .modal-actions .btn{flex:1;}
+  .comment-modal .modal-card{padding:14px;}
+  .comment-header{font-weight:900; text-align:center; margin-bottom:10px;}
+  .comment-list{max-height:55vh; overflow:auto; padding-right:4px;}
+  .comment-item{display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #eee;}
+  .comment-avatar{width:36px;height:36px;border-radius:50%;background:#ddd;flex:0 0 36px;}
+  .comment-body{flex:1;}
+  .comment-name{font-weight:700; font-size:13px;}
+  .comment-text{font-size:13px; margin-top:4px;}
+  .comment-input-row{display:flex; gap:8px; margin-top:12px;}
+  .comment-input-row input{flex:1; border:1px solid #111; border-radius:999px; padding:10px 12px;}
+  .comment-input-row button{border-radius:999px; padding:10px 14px;}
 
   .comment-input{
     display:flex; align-items:center; gap:8px;
@@ -645,6 +656,20 @@
     <div class="modal-actions">
       <button class="btn" id="reportCancel">취소</button>
       <button class="btn" id="reportConfirm">신고</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal comment-modal" id="commentModal">
+  <div class="modal-card">
+    <div class="comment-header">댓글</div>
+    <div class="comment-list" id="commentModalList"></div>
+    <div class="comment-input-row">
+      <input id="commentModalInput" maxlength="40" placeholder="댓글을 입력하세요">
+      <button class="btn" id="commentModalSubmit">등록</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="commentModalClose">닫기</button>
     </div>
   </div>
 </div>
@@ -1216,6 +1241,11 @@ function renderFeed(){
   const commentIcon = document.getElementById("commentIcon");
   const commentArea = document.getElementById("commentArea");
   const commentList = document.getElementById("commentList");
+  const commentModal = document.getElementById("commentModal");
+  const commentModalList = document.getElementById("commentModalList");
+  const commentModalInput = document.getElementById("commentModalInput");
+  const commentModalSubmit = document.getElementById("commentModalSubmit");
+  const commentModalClose = document.getElementById("commentModalClose");
 
   if(writeFromFeedBtn){
     writeFromFeedBtn.addEventListener("click", () => showScreen("ask"));
@@ -1237,9 +1267,25 @@ function renderFeed(){
   }
   if(commentIcon){
     commentIcon.addEventListener("click", () => {
-      const isHidden = commentList.style.display === "none";
-      commentList.style.display = isHidden ? "block" : "none";
-      if(isHidden) renderComments(q.id, commentList);
+      if(!commentModal) return;
+      renderComments(q.id, commentModalList);
+      commentModal.style.display = "flex";
+      commentModalSubmit.onclick = () => {
+        const text = sanitize(commentModalInput.value);
+        if(!text) return;
+        if(containsBannedWord(text)){
+          alert("부적절한 표현이 포함되어 있습니다.");
+          return;
+        }
+        const list = comments[q.id] || [];
+        list.unshift({ text, author: currentProfile.nickname, createdAt: Date.now() });
+        comments[q.id] = list.slice(0, 20);
+        saveLocal(STORAGE_KEYS.comments, comments);
+        commentModalInput.value = "";
+        renderComments(q.id, commentModalList);
+        updateNotifications();
+      };
+      commentModalClose.onclick = () => { commentModal.style.display = "none"; };
     });
   }
 
