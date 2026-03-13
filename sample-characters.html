@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BUY/PASS/THIS/THAT 캐릭터 샘플</title>
+  <style>
+    body{margin:0;background:#050505;color:#f5f5f5;font-family:Inter,system-ui,-apple-system,sans-serif;}
+    .wrap{padding:16px;display:flex;flex-direction:column;gap:24px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .card{padding:8px 12px;border:1px solid #1f1f1f;border-radius:10px;background:#0b0b0b;color:#fff;display:flex;align-items:center;gap:8px}
+    h3{margin:0 0 8px 0;font-size:14px;color:#9cff00;}
+    small{color:#bcbcbc}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <h3>샘플 A — 레트로 픽셀</h3>
+      <div class="row">
+        <div class="card">BUY
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <rect x="2" y="8" width="24" height="16" fill="#2f7bff"/>
+            <rect x="6" y="12" width="4" height="4" fill="#0b0b0b"/>
+            <rect x="18" y="12" width="4" height="4" fill="#0b0b0b"/>
+          </svg>
+        </div>
+        <div class="card">PASS
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <rect x="6" y="6" width="16" height="16" fill="#9cff00"/>
+            <rect x="10" y="10" width="2" height="2" fill="#0b0b0b"/>
+            <rect x="16" y="10" width="2" height="2" fill="#0b0b0b"/>
+          </svg>
+        </div>
+        <div class="card">THIS
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <rect x="6" y="6" width="16" height="16" fill="#2f7bff"/>
+            <rect x="10" y="10" width="8" height="8" fill="#0b0b0b"/>
+          </svg>
+        </div>
+        <div class="card">THAT
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <rect x="6" y="6" width="16" height="16" fill="#ff7a00"/>
+            <rect x="12" y="10" width="4" height="8" fill="#0b0b0b"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>샘플 B — 네온 몬스터</h3>
+      <div class="row">
+        <div class="card">BUY
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <circle cx="14" cy="14" r="9" fill="#2f7bff"/>
+            <circle cx="10" cy="12" r="2" fill="#0b0b0b"/>
+            <circle cx="18" cy="12" r="2" fill="#0b0b0b"/>
+          </svg>
+        </div>
+        <div class="card">PASS
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <polygon points="14,4 24,10 20,24 8,24 4,10" fill="#9cff00"/>
+            <circle cx="11" cy="13" r="2" fill="#0b0b0b"/>
+            <circle cx="17" cy="13" r="2" fill="#0b0b0b"/>
+          </svg>
+        </div>
+        <div class="card">THIS
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <rect x="6" y="6" width="16" height="16" rx="4" fill="#2f7bff"/>
+            <circle cx="11" cy="12" r="2" fill="#0b0b0b"/>
+            <circle cx="17" cy="12" r="2" fill="#0b0b0b"/>
+          </svg>
+        </div>
+        <div class="card">THAT
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <path d="M6 20 Q14 4 22 20 Z" fill="#ff7a00"/>
+            <circle cx="11" cy="14" r="2" fill="#0b0b0b"/>
+            <circle cx="17" cy="14" r="2" fill="#0b0b0b"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3>샘플 C — 글리치 이모지</h3>
+      <div class="row">
+        <div class="card">BUY
+          <span style="font-size:20px;text-shadow:2px 0 #2f7bff,-2px 0 #ff7a00">☺</span>
+        </div>
+        <div class="card">PASS
+          <span style="font-size:20px;text-shadow:2px 0 #9cff00,-2px 0 #ff7a00">✕</span>
+        </div>
+        <div class="card">THIS
+          <span style="font-size:20px;text-shadow:2px 0 #2f7bff,-2px 0 #9cff00">☞</span>
+        </div>
+        <div class="card">THAT
+          <span style="font-size:20px;text-shadow:2px 0 #ff7a00,-2px 0 #2f7bff">➔</span>
+        </div>
+      </div>
+    </div>
+
+    <small>이 파일은 샘플 미리보기용입니다.</small>
+  </div>
+</body>
+</html>
