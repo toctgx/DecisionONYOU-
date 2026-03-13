@@ -95,8 +95,8 @@
     border-bottom:none;
     gap:8px;
   }
-  .title-left{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:#111; cursor:pointer;}
-  .title-left .drop{font-size:12px; margin-left:4px;}
+  .title-left{display:none;}
+  .title-left .drop{display:none;}
   .title-center{text-align:center; font-weight:900; letter-spacing:.8px;}
   .title-right{position:relative; width:28px; height:28px; display:flex; align-items:center; justify-content:center; justify-self:end;}
   .notify-dot{position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:50%; background:#3aa7ff; display:none;}
@@ -434,7 +434,6 @@
   <!-- WELCOME / PROFILE -->
   <section class="window hidden" id="welcomeWindow">
     <div class="titlebar">
-      <span class="title-left" id="locationBtnWelcome"><span id="locationLabelWelcome">집</span><span class="drop">▼</span></span>
       <span class="title-center">결정장애ON YOU</span>
       <span class="title-right" aria-label="알림">
         <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 1 5 5v3.5l1.5 3H5.5l1.5-3V8a5 5 0 0 1 5-5z" stroke="#111" fill="none" stroke-width="2"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="#111" fill="none" stroke-width="2"/></svg>
@@ -498,7 +497,6 @@
   <!-- APP -->
   <section class="window hidden" id="appWindow">
     <div class="titlebar">
-      <span class="title-left" id="locationBtn"><span id="locationLabel">집</span><span class="drop">▼</span></span>
       <span class="title-center">결정장애ON YOU</span>
       <span class="title-right" aria-label="알림">
         <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 1 5 5v3.5l1.5 3H5.5l1.5-3V8a5 5 0 0 1 5-5z" stroke="#111" fill="none" stroke-width="2"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="#111" fill="none" stroke-width="2"/></svg>
@@ -908,7 +906,6 @@ function openApp(){
   safeRenderFeed();
   renderMyPage();
   updateNotifications();
-  initLocationButton();
 }
 
 function makeDraggable(win){
@@ -945,10 +942,6 @@ function showScreen(name){
   Object.values(screens).forEach(el => el.classList.add("hidden"));
   screens[name].classList.remove("hidden");
   statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : "마이페이지";
-  const locationLabel = document.getElementById("locationLabel");
-  if(locationLabel && locationLabel.dataset.manual !== "1"){
-    locationLabel.textContent = name === "home" ? "집" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : "마이페이지";
-  }
 
   if(name === "ask"){
     questionType.value = "";
@@ -1605,31 +1598,6 @@ function updateNotifications(){
   dot.style.display = hasComments ? "block" : "none";
 }
 
-function initLocationButton(){
-  const btn = document.getElementById("locationBtn");
-  const label = document.getElementById("locationLabel");
-  if(!btn || !label || btn.dataset.bound === "1") return;
-  btn.dataset.bound = "1";
-  btn.addEventListener("click", () => {
-    const ok = confirm("현재 위치 사용에 동의하시나요?");
-    if(!ok) return;
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          label.textContent = "현재위치";
-          label.dataset.manual = "1";
-        },
-        () => {
-          label.textContent = "위치 확인 실패";
-          label.dataset.manual = "1";
-        }
-      );
-    }else{
-      label.textContent = "위치 미지원";
-      label.dataset.manual = "1";
-    }
-  });
-}
 
 function renderAdmin(){
   adminReportList.innerHTML = "";
