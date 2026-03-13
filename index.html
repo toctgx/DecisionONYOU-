@@ -1457,7 +1457,6 @@ function renderMyPage(){
 
   const sections = {
     my: { title: "내 질문", listId: "myList", toggleId: "toggleMyList", items: myQuestions },
-    voted: { title: "내 투표현황", listId: "votedList", toggleId: "toggleVotedList", items: votedQuestions },
     fav: { title: "즐겨찾기 목록", listId: "favList", toggleId: "toggleFavList", items: favQuestions }
   };
 
@@ -1513,9 +1512,8 @@ function renderMyPage(){
   };
 
   const myWrap = makeSection("my");
-  const votedWrap = makeSection("voted");
   const favWrap = makeSection("fav");
-  [myWrap, votedWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
+  [myWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
 
   const hookToggle = (btnId, sectionId, listId) => {
     const btn = document.getElementById(btnId);
@@ -1530,7 +1528,6 @@ function renderMyPage(){
   };
 
   hookToggle("btnMyQuestions", "section-my", "myList");
-  hookToggle("btnMyVotes", "section-voted", "votedList");
   hookToggle("btnMyFavs", "section-fav", "favList");
 }
 
