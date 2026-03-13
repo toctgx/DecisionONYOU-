@@ -1639,10 +1639,6 @@ function renderMyPage(){
 
 function updateNotifications(){
   const dot = document.getElementById("notifyDot");
-  if(!dot) return;
-  const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
-  const hasComments = myIds.some(id => (comments[id] || []).length > 0);
-  dot.style.display = hasComments ? "block" : "none";
   const btn = document.getElementById("notifyBtn");
   if(btn && btn.dataset.bound !== "1"){
     btn.dataset.bound = "1";
@@ -1651,6 +1647,10 @@ function updateNotifications(){
       renderNotifications();
     });
   }
+  if(!dot) return;
+  const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
+  const hasComments = myIds.some(id => (comments[id] || []).length > 0);
+  dot.style.display = hasComments ? "block" : "none";
 }
 
 function openReportModal(q){
