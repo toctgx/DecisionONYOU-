@@ -1105,6 +1105,10 @@ function renderFeed(){
 
   const total = q.v1 + q.v2;
   const alreadyVoted = Boolean(votes[q.id]);
+  const authorName = q.author || currentProfile.nickname || "anonymous";
+  const authorAge = q.authorAge || currentProfile.age || "-";
+  const authorGender = q.authorGender || (currentProfile.gender === "male" ? "남" : currentProfile.gender === "female" ? "여" : "-");
+  const authorMbti = q.authorMbti || currentProfile.mbti || "-";
 
   const shell = document.createElement("div");
   shell.className = "question-shell";
@@ -1128,7 +1132,7 @@ function renderFeed(){
       </div>
       ${q.q ? `<p class="q-title" style="margin-top:8px;">${escapeHtml(maskText(q.q))}${isNewQuestion(q) ? ' <span class=\"new-badge\">N</span>' : ''}</p>` : ""}
       <div class="muted" style="margin:4px 0 8px;">
-        ${escapeHtml(q.author || "anonymous")} · ${q.authorAge || "-"} · ${q.authorGender || "-"} · ${q.authorMbti || "-"}
+        ${escapeHtml(authorName)} · ${authorAge} · ${authorGender} · ${authorMbti}
       </div>
 
       <div id="countdownArea" class="${alreadyVoted ? 'hidden' : ''}" style="margin-top:6px;">
