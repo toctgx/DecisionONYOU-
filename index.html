@@ -1818,19 +1818,11 @@ function renderMyPage(){
           <span class="badge">투표 ${total}</span>
           ${key === "my" ? `<button class="btn btn-danger" data-del="${q.id}">삭제</button>` : ""}
         </div>
-        <div class="q-title" style="margin-bottom:6px;">Q. ${escapeHtml(q.q)}</div>
-        <div class="muted" style="display:none;">
-          <div class="row-between" style="gap:8px;">
-            <span>${escapeHtml(q.q)}</span>
-            <span>${q.type === "compare" ? "THIS" : "BUY"} ${total ? Math.round((q.v1/total)*100) : 0}% · ${q.type === "compare" ? "THAT" : "PASS"} ${total ? Math.round((q.v2/total)*100) : 0}%</span>
-          </div>
+        <div class="row-between" style="gap:8px;">
+          <span class="q-title" style="margin:0;">Q. ${escapeHtml(q.q)}</span>
+          <span class="muted">${q.type === "compare" ? "THIS" : "BUY"} ${total ? Math.round((q.v1/total)*100) : 0}% · ${q.type === "compare" ? "THAT" : "PASS"} ${total ? Math.round((q.v2/total)*100) : 0}%</span>
         </div>
       `;
-      item.addEventListener("click", () => {
-        const detail = item.querySelector(".muted");
-        if(!detail) return;
-        detail.style.display = (detail.style.display === "none") ? "block" : "none";
-      });
       if(key === "my"){
         const delBtn = item.querySelector('[data-del]');
         delBtn.addEventListener('click', (e) => {
