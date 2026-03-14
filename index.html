@@ -342,6 +342,10 @@
 
   .hidden{display:none !important;}
   .center{text-align:center;}
+  .empty-box{padding:26px 18px; text-align:center; background:#fff; border-radius:16px; box-shadow:0 6px 18px rgba(0,0,0,.06);}
+  .empty-icon{width:54px; height:54px; border-radius:50%; background:#f3ead7; color:#111; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:22px;}
+  .empty-title{font-weight:800; font-size:14px; margin-bottom:6px;}
+  .empty-desc{font-size:12px; color:#6b6b6b; line-height:1.5;}
 
   .welcome-note{line-height:1.5; font-size:13px;}
   .home-actions{display:flex; gap:14px; align-items:center; margin:10px 0 6px;}
@@ -1780,7 +1784,13 @@ function renderAdmin(){
   adminReportList.innerHTML = "";
   const entries = Object.entries(reports);
   if(entries.length === 0){
-    adminReportList.innerHTML = `<div class="empty-box">신고된 글이 없습니다.</div>`;
+    adminReportList.innerHTML = `
+      <div class="empty-box">
+        <div class="empty-icon">🛡️</div>
+        <div class="empty-title">신고된 글이 없습니다</div>
+        <div class="empty-desc">현재는 안전합니다. 신고가 접수되면 여기에서 확인됩니다.</div>
+      </div>
+    `;
     return;
   }
 
