@@ -1221,6 +1221,13 @@ function showScreen(name){
   if(name === "home"){
     renderNotice();
   }
+
+  if(name === "notifications"){
+    const last = Date.now();
+    saveLocal(STORAGE_KEYS.lastSeenComments, last);
+    const dot = document.getElementById("notifyDot");
+    if(dot) dot.style.display = "none";
+  }
 }
 
 function updateCounts(){
