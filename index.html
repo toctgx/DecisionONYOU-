@@ -1903,11 +1903,12 @@ function addAdminLog(action, detail){
 function renderAdminLogs(){
   const logWrap = document.getElementById("adminLogList");
   if(!logWrap) return;
-  if(adminLogs.length === 0){
+  const filtered = adminLogs.filter(l => !["신고 해제","숨김 해제","콘텐츠 복구","숨김 해제"].includes(l.action));
+  if(filtered.length === 0){
     logWrap.innerHTML = `<div class="muted">처리 로그가 없습니다.</div>`;
     return;
   }
-  logWrap.innerHTML = adminLogs.map(l => `
+  logWrap.innerHTML = filtered.map(l => `
     <div class="card">
       <div class="q-title" style="font-size:13px;">${escapeHtml(l.action)}</div>
       <div class="muted">${escapeHtml(l.detail || "")}</div>
@@ -1991,7 +1992,6 @@ function renderAdmin(){
         <div class="q-title">Q. ${escapeHtml(q.q)}</div>
         <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
         <div class="home-actions" style="margin-top:10px;">
-          <button class="btn" data-action="unreport" data-id="${id}">신고 해제</button>
           <button class="btn btn-danger" data-action="delete" data-id="${id}">삭제</button>
           <button class="btn" data-action="ban" data-author="${escapeHtml(q.author || "unknown")}">이용중지</button>
         </div>
@@ -2003,12 +2003,6 @@ function renderAdmin(){
       btn.addEventListener("click", () => {
         const action = btn.dataset.action;
         const id = btn.dataset.id;
-        if(action === "unreport"){
-          delete reports[id];
-          saveLocal(STORAGE_KEYS.reports, reports);
-          addAdminLog("신고 해제", id);
-          renderAdmin();
-        }
         if(action === "delete"){
           questions = questions.filter(q => q.id !== id);
           delete reports[id];
