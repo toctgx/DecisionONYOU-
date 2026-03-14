@@ -1820,8 +1820,10 @@ function renderMyPage(){
         </div>
         <div class="q-title" style="margin-bottom:6px;">Q. ${escapeHtml(q.q)}</div>
         <div class="muted" style="display:none;">
-          1) ${escapeHtml(q.a1)} (${q.v1})<br>
-          2) ${escapeHtml(q.a2)} (${q.v2})
+          <div class="row-between" style="gap:8px;">
+            <span>${escapeHtml(q.q)}</span>
+            <span>${q.type === "compare" ? "THIS" : "BUY"} ${total ? Math.round((q.v1/total)*100) : 0}% · ${q.type === "compare" ? "THAT" : "PASS"} ${total ? Math.round((q.v2/total)*100) : 0}%</span>
+          </div>
         </div>
       `;
       item.addEventListener("click", () => {
