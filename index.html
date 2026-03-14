@@ -823,7 +823,8 @@ const STORAGE_KEYS = {
   hiddenQuestions: "answerme_hidden_questions_v1",
   warnings: "answerme_warnings_v1",
   extraBanned: "answerme_extra_banned_v1",
-  adminNotice: "answerme_admin_notice_v1"
+  adminNotice: "answerme_admin_notice_v1",
+  votesClearedAt: "answerme_votes_cleared_at_v1"
 };
 
 
@@ -1084,6 +1085,14 @@ function initData(){
   if(typeof adminNotice !== "string"){
     adminNotice = "";
     saveLocal(STORAGE_KEYS.adminNotice, adminNotice);
+  }
+
+  const todayKey = new Date().toISOString().slice(0,10);
+  const lastCleared = loadLocal(STORAGE_KEYS.votesClearedAt, "");
+  if(lastCleared !== todayKey){
+    votes = {};
+    saveLocal(STORAGE_KEYS.votes, votes);
+    saveLocal(STORAGE_KEYS.votesClearedAt, todayKey);
   }
 
   const seeded = loadLocal(STORAGE_KEYS.commentsSeeded, false);
