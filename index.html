@@ -1784,13 +1784,7 @@ function renderAdmin(){
   adminReportList.innerHTML = "";
   const entries = Object.entries(reports);
   if(entries.length === 0){
-    adminReportList.innerHTML = `
-      <div class="empty-box">
-        <div class="empty-icon">🛡️</div>
-        <div class="empty-title">신고된 글이 없습니다</div>
-        <div class="empty-desc">현재는 안전합니다. 신고가 접수되면 여기에서 확인됩니다.</div>
-      </div>
-    `;
+    adminReportList.innerHTML = ``;
     return;
   }
 
