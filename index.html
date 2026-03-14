@@ -650,13 +650,11 @@
 
           <div class="admin-card">
             <div class="admin-title">사용자 관리</div>
-            <div class="admin-desc">유저 조회 및 경고/차단 처리</div>
-            <input class="admin-input" id="adminUserSearchInput" placeholder="닉네임/ID 검색">
+            <div class="admin-desc">신고된 글의 작성자 목록</div>
             <div class="admin-actions">
-              <button class="btn" id="adminUserWarnBtn">경고</button>
-              <button class="btn" id="adminUserBanBtn">차단</button>
+              <button class="btn" id="adminShowReportedUsers">신고 닉네임</button>
             </div>
-            <div id="adminUserResults" style="margin-top:10px;"></div>
+            <div id="adminUserResults" style="margin-top:10px; display:none;"></div>
           </div>
 
           <div class="admin-card">
@@ -1917,27 +1915,54 @@ function renderAdminLogs(){
 }
 
 
-function renderAdminUserResults(term){
+function renderAdminUserResults(){
   const wrap = document.getElementById("adminUserResults");
   if(!wrap) return;
   const users = new Set();
-  questions.forEach(q => users.add(q.author || "unknown"));
-  Object.values(comments).forEach(list => list.forEach(c => users.add(c.author || "unknown")));
-  const filtered = [...users].filter(u => term ? u.includes(term) : true);
-  if(filtered.length === 0){
-    wrap.innerHTML = `<div class="muted">사용자를 찾을 수 없습니다.</div>`;
+  Object.values(reports).forEach(rep => {
+    const author = rep.question?.author || "unknown";
+    if(author) users.add(author);
+  });
+  const list = [...users];
+  if(list.length === 0){
+    wrap.innerHTML = `<div class="muted">신고된 작성자가 없습니다.</div>`;
     return;
   }
-  wrap.innerHTML = filtered.map(u => {
+  wrap.innerHTML = list.map(u => {
     const warn = warnings[u] || 0;
     const banned = bannedUsers[u] ? "(차단됨)" : "";
     return `
       <div class="card">
         <div class="q-title" style="font-size:13px;">${escapeHtml(u)} ${banned}</div>
         <div class="muted">경고: ${warn}회</div>
+        <div class="home-actions" style="margin-top:8px;">
+          <button class="btn" data-warn="${escapeHtml(u)}">경고</button>
+          <button class="btn" data-ban="${escapeHtml(u)}">차단</button>
+        </div>
       </div>
     `;
   }).join("");
+
+  wrap.querySelectorAll("button").forEach(btn => {
+    if(btn.dataset.warn){
+      btn.addEventListener("click", () => {
+        const name = btn.dataset.warn;
+        warnings[name] = (warnings[name] || 0) + 1;
+        saveLocal(STORAGE_KEYS.warnings, warnings);
+        addAdminLog("사용자 경고", name);
+        renderAdminUserResults();
+      });
+    }
+    if(btn.dataset.ban){
+      btn.addEventListener("click", () => {
+        const name = btn.dataset.ban;
+        bannedUsers[name] = { bannedAt: Date.now() };
+        saveLocal(STORAGE_KEYS.banned, bannedUsers);
+        addAdminLog("사용자 차단", name);
+        renderAdminUserResults();
+      });
+    }
+  });
 }
 
 function renderAdminStats(){
@@ -2028,32 +2053,16 @@ function renderAdmin(){
   renderAdminStats();
   renderAdminSettings();
 
-  const userInput = document.getElementById("adminUserSearchInput");
-  const userWarnBtn = document.getElementById("adminUserWarnBtn");
-  const userBanBtn = document.getElementById("adminUserBanBtn");
-  if(userWarnBtn){
-    userWarnBtn.onclick = () => {
-      const name = sanitize(userInput.value || "");
-      if(!name) return;
-      warnings[name] = (warnings[name] || 0) + 1;
-      saveLocal(STORAGE_KEYS.warnings, warnings);
-      addAdminLog("사용자 경고", name);
-      renderAdminUserResults(name);
+  const showReportedUsersBtn = document.getElementById("adminShowReportedUsers");
+  const userWrap = document.getElementById("adminUserResults");
+  if(showReportedUsersBtn){
+    showReportedUsersBtn.onclick = () => {
+      if(userWrap){
+        const next = userWrap.style.display === "none" || !userWrap.style.display ? "block" : "none";
+        userWrap.style.display = next;
+      }
+      renderAdminUserResults();
     };
-  }
-  if(userBanBtn){
-    userBanBtn.onclick = () => {
-      const name = sanitize(userInput.value || "");
-      if(!name) return;
-      bannedUsers[name] = { bannedAt: Date.now() };
-      saveLocal(STORAGE_KEYS.banned, bannedUsers);
-      addAdminLog("사용자 차단", name);
-      renderAdminUserResults(name);
-    };
-  }
-  if(userInput){
-    userInput.oninput = () => renderAdminUserResults(sanitize(userInput.value || ""));
-    if(!userInput.value) renderAdminUserResults("");
   }
 
   const manageBannedBtn = document.getElementById("adminManageBannedBtn");
