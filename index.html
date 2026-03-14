@@ -366,7 +366,7 @@
   .modal .modal-actions .btn{flex:1;}
   .comment-modal .modal-card{padding:14px; display:flex; flex-direction:column; height:80vh;}
   .comment-header{font-weight:900; text-align:center; margin-bottom:10px;}
-  .comment-list{flex:1; max-height:50vh; overflow-y:auto; padding-right:4px; margin-bottom:8px; -webkit-overflow-scrolling:touch;}
+  .comment-list{flex:1; max-height:50vh; overflow-y:auto; padding-right:4px; margin-bottom:8px; -webkit-overflow-scrolling:touch; touch-action:pan-y;}
   .comment-item{display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #eee;}
   .comment-avatar{width:36px;height:36px;border-radius:50%;background:#ddd;flex:0 0 36px;}
   .comment-body{flex:1;}
@@ -1323,6 +1323,7 @@ function renderFeed(){
         comments[q.id] = list.slice(0, 20);
         saveLocal(STORAGE_KEYS.comments, comments);
         commentModalInput.value = "";
+        commentModalInput.blur();
         renderComments(q.id, commentModalList);
         updateNotifications();
       };
