@@ -1976,12 +1976,35 @@ function renderAdminLogs(){
     logWrap.innerHTML = `<div class="muted">처리 로그가 없습니다.</div>`;
     return;
   }
-  logWrap.innerHTML = filtered.map(l => `
-    <div class="card">
-      <div class="q-title" style="font-size:13px;">${escapeHtml(l.action)}</div>
-      <div class="muted">${escapeHtml(l.detail || "")}</div>
+  const formatDate = (ts) => {
+    const d = new Date(ts);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    const h = String(d.getHours()).padStart(2,'0');
+    const min = String(d.getMinutes()).padStart(2,'0');
+    return `${y}.${m}.${day} ${h}:${min}`;
+  };
+
+  logWrap.innerHTML = filtered.map((l, i) => `
+    <div class="card admin-log" data-log>
+      <div class="row-between admin-log-header" data-log-header>
+        <div class="q-title" style="font-size:13px;">${escapeHtml(l.action)}</div>
+        <div class="muted" style="font-size:11px;">${formatDate(l.at)}</div>
+      </div>
+      <div class="muted admin-log-body" style="margin-top:6px; display:none;">${escapeHtml(l.detail || "")}</div>
     </div>
   `).join("");
+
+  logWrap.querySelectorAll('[data-log]').forEach(card => {
+    const header = card.querySelector('[data-log-header]');
+    const body = card.querySelector('.admin-log-body');
+    if(header && body){
+      header.onclick = () => {
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+      };
+    }
+  });
 }
 
 
