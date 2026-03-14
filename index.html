@@ -636,40 +636,43 @@
             <div class="admin-title">신고 / 검수</div>
             <div class="admin-desc">신고된 게시물을 확인하고 처리합니다.</div>
             <div class="admin-actions">
-              <button class="btn">신고 목록</button>
-              <button class="btn">처리 로그</button>
+              <button class="btn" id="adminShowReports">신고 목록</button>
+              <button class="btn" id="adminShowLogs">처리 로그</button>
             </div>
             <div id="adminReportList" style="margin-top:10px;"></div>
+            <div id="adminLogList" style="margin-top:10px;"></div>
           </div>
 
           <div class="admin-card">
             <div class="admin-title">콘텐츠 관리</div>
             <div class="admin-desc">질문/댓글 검색 및 숨김/복구 관리</div>
-            <input class="admin-input" placeholder="질문/댓글 검색">
+            <input class="admin-input" id="adminContentSearchInput" placeholder="질문/댓글 검색">
             <div class="admin-actions">
-              <button class="btn">검색</button>
-              <button class="btn">숨김 해제</button>
+              <button class="btn" id="adminContentSearchBtn">검색</button>
+              <button class="btn" id="adminContentUnhideBtn">숨김 해제</button>
             </div>
+            <div id="adminContentResults" style="margin-top:10px;"></div>
           </div>
 
           <div class="admin-card">
             <div class="admin-title">사용자 관리</div>
             <div class="admin-desc">유저 조회 및 경고/차단 처리</div>
-            <input class="admin-input" placeholder="닉네임/ID 검색">
+            <input class="admin-input" id="adminUserSearchInput" placeholder="닉네임/ID 검색">
             <div class="admin-actions">
-              <button class="btn">경고</button>
-              <button class="btn">차단</button>
+              <button class="btn" id="adminUserWarnBtn">경고</button>
+              <button class="btn" id="adminUserBanBtn">차단</button>
             </div>
+            <div id="adminUserResults" style="margin-top:10px;"></div>
           </div>
 
           <div class="admin-card">
             <div class="admin-title">통계</div>
             <div class="admin-desc">간단 지표 확인</div>
             <div class="admin-metrics">
-              <div class="admin-metric"><div class="val">—</div><div class="label">DAU</div></div>
-              <div class="admin-metric"><div class="val">—</div><div class="label">신규 가입</div></div>
-              <div class="admin-metric"><div class="val">—</div><div class="label">신고 건수</div></div>
-              <div class="admin-metric"><div class="val">—</div><div class="label">댓글 수</div></div>
+              <div class="admin-metric"><div class="val" id="adminMetricDau">—</div><div class="label">DAU</div></div>
+              <div class="admin-metric"><div class="val" id="adminMetricNew">—</div><div class="label">신규 가입</div></div>
+              <div class="admin-metric"><div class="val" id="adminMetricReports">—</div><div class="label">신고 건수</div></div>
+              <div class="admin-metric"><div class="val" id="adminMetricComments">—</div><div class="label">댓글 수</div></div>
             </div>
           </div>
 
@@ -677,9 +680,10 @@
             <div class="admin-title">설정</div>
             <div class="admin-desc">금지어 및 운영 공지 관리</div>
             <div class="admin-actions">
-              <button class="btn">금지어 관리</button>
-              <button class="btn">공지 설정</button>
+              <button class="btn" id="adminManageBannedBtn">금지어 관리</button>
+              <button class="btn" id="adminNoticeBtn">공지 설정</button>
             </div>
+            <div id="adminSettingsList" style="margin-top:10px;"></div>
           </div>
         </div>
       </div>
@@ -765,7 +769,11 @@ const STORAGE_KEYS = {
   cleared: "answerme_cleared_v1",
   clearedCompare: "answerme_cleared_compare_v1",
   commentsSeeded: "answerme_comments_seeded_v1",
-  lastSeenComments: "answerme_last_seen_comments_v1"
+  lastSeenComments: "answerme_last_seen_comments_v1",
+  adminLogs: "answerme_admin_logs_v1",
+  hiddenQuestions: "answerme_hidden_questions_v1",
+  warnings: "answerme_warnings_v1",
+  extraBanned: "answerme_extra_banned_v1"
 };
 
 
@@ -903,6 +911,11 @@ const nicknameEdit = document.getElementById("nicknameEdit");
 const saveProfileEditBtn = document.getElementById("saveProfileEditBtn");
 const myMessage = document.getElementById("myMessage");
 const adminReportList = document.getElementById("adminReportList");
+let adminLogs = [];
+let hiddenQuestions = {};
+let warnings = {};
+let extraBanned = [];
+let adminContentSearchTerm = "";
 
 function makeId(){
   return "q_" + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
@@ -938,6 +951,10 @@ function initData(){
   reports = loadLocal(STORAGE_KEYS.reports, {});
   bannedUsers = loadLocal(STORAGE_KEYS.banned, {});
   favorites = loadLocal(STORAGE_KEYS.favorites, {});
+  adminLogs = loadLocal(STORAGE_KEYS.adminLogs, []);
+  hiddenQuestions = loadLocal(STORAGE_KEYS.hiddenQuestions, {});
+  warnings = loadLocal(STORAGE_KEYS.warnings, {});
+  extraBanned = loadLocal(STORAGE_KEYS.extraBanned, []);
   session = loadLocal(STORAGE_KEYS.session, {
     sort: "latest",
     currentQueue: [],
@@ -995,6 +1012,22 @@ function initData(){
   if(typeof favorites !== "object" || favorites === null){
     favorites = {};
     saveLocal(STORAGE_KEYS.favorites, favorites);
+  }
+  if(!Array.isArray(adminLogs)){
+    adminLogs = [];
+    saveLocal(STORAGE_KEYS.adminLogs, adminLogs);
+  }
+  if(typeof hiddenQuestions !== "object" || hiddenQuestions === null){
+    hiddenQuestions = {};
+    saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
+  }
+  if(typeof warnings !== "object" || warnings === null){
+    warnings = {};
+    saveLocal(STORAGE_KEYS.warnings, warnings);
+  }
+  if(!Array.isArray(extraBanned)){
+    extraBanned = [];
+    saveLocal(STORAGE_KEYS.extraBanned, extraBanned);
   }
 
   const seeded = loadLocal(STORAGE_KEYS.commentsSeeded, false);
@@ -1142,7 +1175,8 @@ function normalizeText(text){
 
 function containsBannedWord(text){
   const normalized = normalizeText(text);
-  return bannedWords.some(word => normalized.includes(word));
+  const all = [...bannedWords, ...(extraBanned || [])];
+  return all.some(word => normalized.includes(word));
 }
 
 function maskText(text){
@@ -1180,7 +1214,7 @@ function validateQuestion(q){
 }
 
 function getSortedQuestions(){
-  let arr = [...questions].filter(q => !reports[q.id]);
+  let arr = [...questions].filter(q => !reports[q.id] && !hiddenQuestions[q.id]);
 
   // 최신: 사라/마라, 인기: 이거/저거
   if(session.sort === "latest"){
@@ -1841,56 +1875,261 @@ function renderNotifications(){
   `).join("");
 }
 
+function addAdminLog(action, detail){
+  adminLogs.unshift({ action, detail, at: Date.now() });
+  adminLogs = adminLogs.slice(0, 50);
+  saveLocal(STORAGE_KEYS.adminLogs, adminLogs);
+}
+
+function renderAdminLogs(){
+  const logWrap = document.getElementById("adminLogList");
+  if(!logWrap) return;
+  if(adminLogs.length === 0){
+    logWrap.innerHTML = `<div class="muted">처리 로그가 없습니다.</div>`;
+    return;
+  }
+  logWrap.innerHTML = adminLogs.map(l => `
+    <div class="card">
+      <div class="q-title" style="font-size:13px;">${escapeHtml(l.action)}</div>
+      <div class="muted">${escapeHtml(l.detail || "")}</div>
+    </div>
+  `).join("");
+}
+
+function renderAdminContentResults(term){
+  const wrap = document.getElementById("adminContentResults");
+  if(!wrap) return;
+  if(!term){
+    wrap.innerHTML = `<div class="muted">검색어를 입력하세요.</div>`;
+    return;
+  }
+  const list = questions.filter(q => q.q.includes(term));
+  if(list.length === 0){
+    wrap.innerHTML = `<div class="muted">검색 결과가 없습니다.</div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(q => `
+    <div class="card">
+      <div class="q-title" style="font-size:13px;">Q. ${escapeHtml(q.q)}</div>
+      <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
+      <div class="home-actions" style="margin-top:8px;">
+        <button class="btn" data-hide="${q.id}">숨김</button>
+        <button class="btn" data-unhide="${q.id}">숨김 해제</button>
+      </div>
+    </div>
+  `).join("");
+
+  wrap.querySelectorAll("button").forEach(btn => {
+    if(btn.dataset.hide){
+      btn.addEventListener("click", () => {
+        hiddenQuestions[btn.dataset.hide] = true;
+        saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
+        addAdminLog("콘텐츠 숨김", btn.dataset.hide);
+        renderAdminContentResults(term);
+      });
+    }
+    if(btn.dataset.unhide){
+      btn.addEventListener("click", () => {
+        delete hiddenQuestions[btn.dataset.unhide];
+        saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
+        addAdminLog("콘텐츠 복구", btn.dataset.unhide);
+        renderAdminContentResults(term);
+      });
+    }
+  });
+}
+
+function renderAdminUserResults(term){
+  const wrap = document.getElementById("adminUserResults");
+  if(!wrap) return;
+  const users = new Set();
+  questions.forEach(q => users.add(q.author || "unknown"));
+  Object.values(comments).forEach(list => list.forEach(c => users.add(c.author || "unknown")));
+  const filtered = [...users].filter(u => term ? u.includes(term) : true);
+  if(filtered.length === 0){
+    wrap.innerHTML = `<div class="muted">사용자를 찾을 수 없습니다.</div>`;
+    return;
+  }
+  wrap.innerHTML = filtered.map(u => {
+    const warn = warnings[u] || 0;
+    const banned = bannedUsers[u] ? "(차단됨)" : "";
+    return `
+      <div class="card">
+        <div class="q-title" style="font-size:13px;">${escapeHtml(u)} ${banned}</div>
+        <div class="muted">경고: ${warn}회</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderAdminStats(){
+  const dau = new Set(questions.map(q => q.author)).size;
+  const commentsCount = Object.values(comments).reduce((acc, list) => acc + list.length, 0);
+  const reportsCount = Object.keys(reports).length;
+  const recentUsers = new Set(questions.filter(q => Date.now() - q.createdAt < 24*60*60*1000).map(q => q.author)).size;
+
+  const elDau = document.getElementById("adminMetricDau");
+  const elNew = document.getElementById("adminMetricNew");
+  const elReports = document.getElementById("adminMetricReports");
+  const elComments = document.getElementById("adminMetricComments");
+  if(elDau) elDau.textContent = dau || 0;
+  if(elNew) elNew.textContent = recentUsers || 0;
+  if(elReports) elReports.textContent = reportsCount || 0;
+  if(elComments) elComments.textContent = commentsCount || 0;
+}
+
+function renderAdminSettings(){
+  const wrap = document.getElementById("adminSettingsList");
+  if(!wrap) return;
+  if(!extraBanned || extraBanned.length === 0){
+    wrap.innerHTML = `<div class="muted">추가 금지어 없음</div>`;
+    return;
+  }
+  wrap.innerHTML = extraBanned.map(w => `
+    <div class="card">
+      <div class="q-title" style="font-size:13px;">${escapeHtml(w)}</div>
+    </div>
+  `).join("");
+}
+
 function renderAdmin(){
   adminReportList.innerHTML = "";
   const entries = Object.entries(reports);
   if(entries.length === 0){
     adminReportList.innerHTML = ``;
-    return;
+  }else{
+    entries.forEach(([id, rep]) => {
+      const q = rep.question || questions.find(x => x.id === id) || { q: "(삭제됨)", author:"unknown" };
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="q-title">Q. ${escapeHtml(q.q)}</div>
+        <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
+        <div class="home-actions" style="margin-top:10px;">
+          <button class="btn" data-action="unreport" data-id="${id}">신고 해제</button>
+          <button class="btn btn-danger" data-action="delete" data-id="${id}">삭제</button>
+          <button class="btn" data-action="ban" data-author="${escapeHtml(q.author || "unknown")}">이용중지</button>
+        </div>
+      `;
+      adminReportList.appendChild(card);
+    });
+
+    adminReportList.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const action = btn.dataset.action;
+        const id = btn.dataset.id;
+        if(action === "unreport"){
+          delete reports[id];
+          saveLocal(STORAGE_KEYS.reports, reports);
+          addAdminLog("신고 해제", id);
+          renderAdmin();
+        }
+        if(action === "delete"){
+          questions = questions.filter(q => q.id !== id);
+          delete reports[id];
+          saveLocal(STORAGE_KEYS.questions, questions);
+          saveLocal(STORAGE_KEYS.reports, reports);
+          addAdminLog("콘텐츠 삭제", id);
+          renderAdmin();
+        }
+        if(action === "ban"){
+          const author = btn.dataset.author;
+          if(author && author !== "unknown"){
+            bannedUsers[author] = { bannedAt: Date.now() };
+            saveLocal(STORAGE_KEYS.banned, bannedUsers);
+            addAdminLog("사용자 차단", author);
+          }
+          renderAdmin();
+        }
+      });
+    });
   }
 
-  entries.forEach(([id, rep]) => {
-    const q = rep.question || questions.find(x => x.id === id) || { q: "(삭제됨)", author:"unknown" };
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="q-title">Q. ${escapeHtml(q.q)}</div>
-      <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
-      <div class="home-actions" style="margin-top:10px;">
-        <button class="btn" data-action="unreport" data-id="${id}">신고 해제</button>
-        <button class="btn btn-danger" data-action="delete" data-id="${id}">삭제</button>
-        <button class="btn" data-action="ban" data-author="${escapeHtml(q.author || "unknown")}">이용중지</button>
-      </div>
-    `;
-    adminReportList.appendChild(card);
-  });
+  renderAdminLogs();
+  renderAdminStats();
+  renderAdminSettings();
 
-  adminReportList.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
-      if(action === "unreport"){
-        delete reports[id];
-        saveLocal(STORAGE_KEYS.reports, reports);
-        renderAdmin();
-      }
-      if(action === "delete"){
-        questions = questions.filter(q => q.id !== id);
-        delete reports[id];
-        saveLocal(STORAGE_KEYS.questions, questions);
-        saveLocal(STORAGE_KEYS.reports, reports);
-        renderAdmin();
-      }
-      if(action === "ban"){
-        const author = btn.dataset.author;
-        if(author && author !== "unknown"){
-          bannedUsers[author] = { bannedAt: Date.now() };
-          saveLocal(STORAGE_KEYS.banned, bannedUsers);
-        }
-        renderAdmin();
-      }
-    });
-  });
+  const contentInput = document.getElementById("adminContentSearchInput");
+  const contentBtn = document.getElementById("adminContentSearchBtn");
+  const contentUnhideBtn = document.getElementById("adminContentUnhideBtn");
+  if(contentBtn){
+    contentBtn.onclick = () => {
+      adminContentSearchTerm = sanitize(contentInput.value || "");
+      renderAdminContentResults(adminContentSearchTerm);
+    };
+  }
+  if(contentUnhideBtn){
+    contentUnhideBtn.onclick = () => {
+      hiddenQuestions = {};
+      saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
+      addAdminLog("숨김 해제", "전체");
+      renderAdminContentResults(adminContentSearchTerm);
+    };
+  }
+
+  const userInput = document.getElementById("adminUserSearchInput");
+  const userWarnBtn = document.getElementById("adminUserWarnBtn");
+  const userBanBtn = document.getElementById("adminUserBanBtn");
+  if(userWarnBtn){
+    userWarnBtn.onclick = () => {
+      const name = sanitize(userInput.value || "");
+      if(!name) return;
+      warnings[name] = (warnings[name] || 0) + 1;
+      saveLocal(STORAGE_KEYS.warnings, warnings);
+      addAdminLog("사용자 경고", name);
+      renderAdminUserResults(name);
+    };
+  }
+  if(userBanBtn){
+    userBanBtn.onclick = () => {
+      const name = sanitize(userInput.value || "");
+      if(!name) return;
+      bannedUsers[name] = { bannedAt: Date.now() };
+      saveLocal(STORAGE_KEYS.banned, bannedUsers);
+      addAdminLog("사용자 차단", name);
+      renderAdminUserResults(name);
+    };
+  }
+  if(userInput){
+    userInput.oninput = () => renderAdminUserResults(sanitize(userInput.value || ""));
+    if(!userInput.value) renderAdminUserResults("");
+  }
+
+  const manageBannedBtn = document.getElementById("adminManageBannedBtn");
+  const noticeBtn = document.getElementById("adminNoticeBtn");
+  if(manageBannedBtn){
+    manageBannedBtn.onclick = () => {
+      const word = prompt("추가할 금지어를 입력하세요");
+      if(!word) return;
+      extraBanned.push(word);
+      saveLocal(STORAGE_KEYS.extraBanned, extraBanned);
+      addAdminLog("금지어 추가", word);
+      renderAdminSettings();
+    };
+  }
+  if(noticeBtn){
+    noticeBtn.onclick = () => {
+      const msg = prompt("공지 내용을 입력하세요");
+      if(!msg) return;
+      addAdminLog("공지 설정", msg);
+      alert("공지 저장됨");
+    };
+  }
+
+  const showReportsBtn = document.getElementById("adminShowReports");
+  const showLogsBtn = document.getElementById("adminShowLogs");
+  if(showReportsBtn){
+    showReportsBtn.onclick = () => {
+      const el = document.getElementById("adminReportList");
+      if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+  }
+  if(showLogsBtn){
+    showLogsBtn.onclick = () => {
+      const el = document.getElementById("adminLogList");
+      if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+    };
+  }
 }
 
 function setSortButtons(){
