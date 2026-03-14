@@ -238,6 +238,15 @@
   .admin-metric{background:#f7f4ee; border-radius:12px; padding:10px; text-align:center;}
   .admin-metric .val{font-weight:900; font-size:16px;}
   .admin-metric .label{font-size:11px; color:#6b6b6b;}
+  .admin-tabs{display:flex; gap:8px; margin:8px 0; flex-wrap:wrap;}
+  .admin-tab-btn{background:#fff; color:#111; border:1px solid #111; border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700;}
+  .admin-tab-btn.active{background:#111; color:#fff;}
+  .admin-tab-content{display:none;}
+  .admin-tab-content.active{display:block;}
+  .admin-section{background:#fff; border-radius:14px; padding:12px;}
+  .admin-section-header{display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer;}
+  .admin-section-body{margin-top:8px;}
+  .admin-section.collapsed .admin-section-body{display:none;}
 
   .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
   .row-between{display:flex; justify-content:space-between; gap:8px; align-items:center;}
@@ -636,48 +645,99 @@
         <div class="panel">
           <div style="font-weight:800;">관리</div>
           <div class="small">파일럿 기준 기본 관리 기능</div>
+          <div class="admin-tabs">
+            <button class="admin-tab-btn active" data-admin-tab="reports">신고/검수</button>
+            <button class="admin-tab-btn" data-admin-tab="users">사용자</button>
+            <button class="admin-tab-btn" data-admin-tab="stats">통계</button>
+            <button class="admin-tab-btn" data-admin-tab="settings">설정</button>
+          </div>
         </div>
-        <div class="admin-grid">
-          <div class="admin-card" id="adminReportsCard">
-            <div class="admin-title">신고 / 검수</div>
-            <div class="admin-desc">신고된 게시물을 확인하고 처리합니다.</div>
-            <div class="admin-actions">
-              <button class="btn" id="adminShowReports">신고 목록</button>
-              <button class="btn" id="adminShowLogs">처리 로그</button>
+
+        <div class="admin-tab-content active" data-admin-content="reports">
+          <div class="admin-grid">
+            <div class="admin-card admin-section" data-section>
+              <div class="admin-section-header">
+                <div>
+                  <div class="admin-title">신고 / 검수</div>
+                  <div class="admin-desc">신고된 게시물을 확인하고 처리합니다.</div>
+                </div>
+                <button class="btn" id="adminShowReports">신고 목록</button>
+              </div>
+              <div class="admin-section-body">
+                <div id="adminReportList" style="margin-top:10px;"></div>
+              </div>
             </div>
-            <div id="adminReportList" style="margin-top:10px;"></div>
-            <div id="adminLogList" style="margin-top:10px;"></div>
-          </div>
 
-
-          <div class="admin-card">
-            <div class="admin-title">사용자 관리</div>
-            <div class="admin-desc">신고된 글의 작성자 목록</div>
-            <div class="admin-actions">
-              <button class="btn" id="adminShowReportedUsers">신고 닉네임</button>
-            </div>
-            <div id="adminUserResults" style="margin-top:10px; display:none;"></div>
-          </div>
-
-          <div class="admin-card">
-            <div class="admin-title">통계</div>
-            <div class="admin-desc">간단 지표 확인</div>
-            <div class="admin-metrics">
-              <div class="admin-metric"><div class="val" id="adminMetricDau">—</div><div class="label">DAU</div></div>
-              <div class="admin-metric"><div class="val" id="adminMetricNew">—</div><div class="label">신규 가입</div></div>
-              <div class="admin-metric"><div class="val" id="adminMetricReports">—</div><div class="label">신고 건수</div></div>
-              <div class="admin-metric"><div class="val" id="adminMetricComments">—</div><div class="label">댓글 수</div></div>
+            <div class="admin-card admin-section" data-section>
+              <div class="admin-section-header">
+                <div>
+                  <div class="admin-title">처리 로그</div>
+                  <div class="admin-desc">관리자 처리 이력</div>
+                </div>
+                <button class="btn" id="adminShowLogs">로그 보기</button>
+              </div>
+              <div class="admin-section-body">
+                <div id="adminLogList" style="margin-top:10px;"></div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="admin-card">
-            <div class="admin-title">설정</div>
-            <div class="admin-desc">금지어 및 운영 공지 관리</div>
-            <div class="admin-actions">
-              <button class="btn" id="adminManageBannedBtn">금지어 관리</button>
-              <button class="btn" id="adminNoticeBtn">공지 설정</button>
+        <div class="admin-tab-content" data-admin-content="users">
+          <div class="admin-grid">
+            <div class="admin-card admin-section" data-section>
+              <div class="admin-section-header">
+                <div>
+                  <div class="admin-title">신고 닉네임</div>
+                  <div class="admin-desc">신고된 글의 작성자 목록</div>
+                </div>
+                <button class="btn" id="adminShowReportedUsers">닉네임 보기</button>
+              </div>
+              <div class="admin-section-body">
+                <div id="adminUserResults" style="margin-top:10px; display:none;"></div>
+              </div>
             </div>
-            <div id="adminSettingsList" style="margin-top:10px;"></div>
+          </div>
+        </div>
+
+        <div class="admin-tab-content" data-admin-content="stats">
+          <div class="admin-grid">
+            <div class="admin-card admin-section" data-section>
+              <div class="admin-section-header">
+                <div>
+                  <div class="admin-title">통계</div>
+                  <div class="admin-desc">간단 지표 확인</div>
+                </div>
+              </div>
+              <div class="admin-section-body">
+                <div class="admin-metrics">
+                  <div class="admin-metric"><div class="val" id="adminMetricDau">—</div><div class="label">DAU</div></div>
+                  <div class="admin-metric"><div class="val" id="adminMetricNew">—</div><div class="label">신규 가입</div></div>
+                  <div class="admin-metric"><div class="val" id="adminMetricReports">—</div><div class="label">신고 건수</div></div>
+                  <div class="admin-metric"><div class="val" id="adminMetricComments">—</div><div class="label">댓글 수</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-tab-content" data-admin-content="settings">
+          <div class="admin-grid">
+            <div class="admin-card admin-section" data-section>
+              <div class="admin-section-header">
+                <div>
+                  <div class="admin-title">설정</div>
+                  <div class="admin-desc">금지어 및 운영 공지 관리</div>
+                </div>
+              </div>
+              <div class="admin-section-body">
+                <div class="admin-actions">
+                  <button class="btn" id="adminManageBannedBtn">금지어 관리</button>
+                  <button class="btn" id="adminNoticeBtn">공지 설정</button>
+                </div>
+                <div id="adminSettingsList" style="margin-top:10px;"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2016,6 +2076,33 @@ function renderAdminSettings(){
   wrap.innerHTML = `${noticeBlock}${bannedBlock}`;
 }
 
+function initAdminTabs(){
+  const tabs = document.querySelectorAll(".admin-tab-btn");
+  const contents = document.querySelectorAll(".admin-tab-content");
+  if(tabs.length === 0) return;
+  tabs.forEach(btn => {
+    if(btn.dataset.bound === "1") return;
+    btn.dataset.bound = "1";
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.adminTab;
+      tabs.forEach(b => b.classList.toggle("active", b === btn));
+      contents.forEach(c => c.classList.toggle("active", c.dataset.adminContent === target));
+    });
+  });
+}
+
+function initAdminSections(){
+  document.querySelectorAll(".admin-section-header").forEach(header => {
+    if(header.dataset.bound === "1") return;
+    header.dataset.bound = "1";
+    header.addEventListener("click", (e) => {
+      if(e.target.closest(".btn")) return;
+      const card = header.closest(".admin-section");
+      if(card) card.classList.toggle("collapsed");
+    });
+  });
+}
+
 function renderAdmin(){
   adminReportList.innerHTML = "";
   const entries = Object.entries(reports);
@@ -2148,6 +2235,9 @@ function renderAdmin(){
       if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
     };
   }
+
+  initAdminTabs();
+  initAdminSections();
 }
 
 function setSortButtons(){
