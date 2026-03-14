@@ -226,6 +226,16 @@
   .icon-btn.active{opacity:.95;}
 
   .muted{color:#444; font-size:12px;}
+  .admin-grid{display:grid; gap:12px; margin-top:8px;}
+  .admin-card{background:#fff; border:none; border-radius:14px; padding:14px; box-shadow:none;}
+  .admin-title{font-weight:800; font-size:14px; margin-bottom:6px;}
+  .admin-desc{font-size:12px; color:#6b6b6b; margin-bottom:10px; line-height:1.5;}
+  .admin-actions{display:flex; gap:8px; flex-wrap:wrap;}
+  .admin-input{width:100%; border:1px solid #111; border-radius:12px; padding:10px 12px; font-size:14px; margin-bottom:8px;}
+  .admin-metrics{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .admin-metric{background:#f7f4ee; border-radius:12px; padding:10px; text-align:center;}
+  .admin-metric .val{font-weight:900; font-size:16px;}
+  .admin-metric .label{font-size:11px; color:#6b6b6b;}
 
   .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
   .row-between{display:flex; justify-content:space-between; gap:8px; align-items:center;}
@@ -618,9 +628,60 @@
       <!-- ADMIN -->
       <div id="screen-admin" class="hidden">
         <div class="panel">
-          <div class="small">신고된 글은 자동 비공개 처리됩니다.</div>
+          <div style="font-weight:800;">관리</div>
+          <div class="small">파일럿 기준 기본 관리 기능</div>
         </div>
-        <div id="adminReportList"></div>
+        <div class="admin-grid">
+          <div class="admin-card" id="adminReportsCard">
+            <div class="admin-title">신고 / 검수</div>
+            <div class="admin-desc">신고된 게시물을 확인하고 처리합니다.</div>
+            <div class="admin-actions">
+              <button class="btn">신고 목록</button>
+              <button class="btn">처리 로그</button>
+            </div>
+            <div id="adminReportList" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-title">콘텐츠 관리</div>
+            <div class="admin-desc">질문/댓글 검색 및 숨김/복구 관리</div>
+            <input class="admin-input" placeholder="질문/댓글 검색">
+            <div class="admin-actions">
+              <button class="btn">검색</button>
+              <button class="btn">숨김 해제</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-title">사용자 관리</div>
+            <div class="admin-desc">유저 조회 및 경고/차단 처리</div>
+            <input class="admin-input" placeholder="닉네임/ID 검색">
+            <div class="admin-actions">
+              <button class="btn">경고</button>
+              <button class="btn">차단</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-title">통계</div>
+            <div class="admin-desc">간단 지표 확인</div>
+            <div class="admin-metrics">
+              <div class="admin-metric"><div class="val">—</div><div class="label">DAU</div></div>
+              <div class="admin-metric"><div class="val">—</div><div class="label">신규 가입</div></div>
+              <div class="admin-metric"><div class="val">—</div><div class="label">신고 건수</div></div>
+              <div class="admin-metric"><div class="val">—</div><div class="label">댓글 수</div></div>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-title">설정</div>
+            <div class="admin-desc">금지어 및 운영 공지 관리</div>
+            <div class="admin-actions">
+              <button class="btn">금지어 관리</button>
+              <button class="btn">공지 설정</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- NOTIFICATIONS -->
