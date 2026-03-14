@@ -622,21 +622,19 @@
           <div class="small">회원가입 없는 로컬 테스트 버전</div>
           <div class="hr"></div>
 
-          <div class="row">
-            <span class="badge badge-btn" id="btnMyQuestions">내 질문 <span id="myQuestionCount">0</span></span>
-            <span class="badge badge-btn" id="btnMyVotes">내 투표현황 <span id="myVoteCount">0</span></span>
-            <span class="badge badge-btn" id="btnMyFavs">즐겨찾기 <span id="myFavCount">0</span></span>
-          </div>
-
-          <div class="hr"></div>
-
           <label class="label" for="nicknameEdit">닉네임 변경</label>
-          <input id="nicknameEdit" class="input" maxlength="12" placeholder="새 닉네임 (2~12자)">
+          <div class="row-between">
+            <input id="nicknameEdit" class="input" maxlength="12" placeholder="새 닉네임 (2~12자)" style="flex:1;">
+            <button class="btn" id="saveProfileEditBtn" style="margin-left:8px; white-space:nowrap;">프로필 저장</button>
+          </div>
 
           <div id="myMessage" class="error"></div>
 
-          <div class="home-actions">
-            <button class="btn" id="saveProfileEditBtn">프로필 저장</button>
+          <div class="hr"></div>
+
+          <div class="row">
+            <span class="badge badge-btn" id="btnMyQuestions">내 질문 <span id="myQuestionCount">0</span></span>
+            <span class="badge badge-btn" id="btnMyVotes">내 투표현황 <span id="myVoteCount">0</span></span>
           </div>
         </div>
 
@@ -1235,11 +1233,8 @@ function updateCounts(){
   questionTotalText.textContent = "Questions: " + totalCount;
   const myQuestions = questions.filter(q => q.author === currentProfile.nickname);
   const myVotes = Object.keys(votes).length;
-  const myFavs = Object.keys(favorites || {}).length;
   myQuestionCount.textContent = myQuestions.length;
   myVoteCount.textContent = myVotes;
-  const favEl = document.getElementById("myFavCount");
-  if(favEl) favEl.textContent = myFavs;
   myNickLabel.textContent = currentProfile.nickname;
 }
 
@@ -1778,15 +1773,12 @@ function renderMyPage(){
 
   const votedIds = Object.keys(votes);
   const votedQuestions = questions.filter(q => votedIds.includes(q.id));
-  const favIds = Object.keys(favorites || {});
-  const favQuestions = questions.filter(q => favIds.includes(q.id));
-
   myQuestionList.innerHTML = "";
 
-  if(myQuestions.length === 0 && votedQuestions.length === 0 && favQuestions.length === 0){
+  if(myQuestions.length === 0 && votedQuestions.length === 0){
     myQuestionList.innerHTML = `
       <div class="empty-box">
-        아직 작성/결정/즐겨찾기한 질문이 없습니다.
+        아직 작성/결정한 질문이 없습니다.
       </div>
     `;
     return;
@@ -1794,7 +1786,7 @@ function renderMyPage(){
 
   const sections = {
     my: { title: "내 질문", listId: "myList", toggleId: "toggleMyList", items: myQuestions },
-    fav: { title: "즐겨찾기 목록", listId: "favList", toggleId: "toggleFavList", items: favQuestions }
+    voted: { title: "내 투표현황", listId: "voteList", toggleId: "toggleVoteList", items: votedQuestions }
   };
 
   const makeSection = (key) => {
@@ -1804,9 +1796,7 @@ function renderMyPage(){
     wrap.className = "card";
     wrap.id = `section-${key}`;
     wrap.innerHTML = `
-      <div class="row-between" style="margin-bottom:6px;">
-        <span class="badge">${sec.title}</span>
-      </div>
+      <div class="small" style="margin-bottom:6px;">${sec.title}</div>
       <div id="${sec.listId}" style="display:none;"></div>
     `;
     const listEl = wrap.querySelector(`#${sec.listId}`);
@@ -1865,7 +1855,7 @@ function renderMyPage(){
   };
 
   hookToggle("btnMyQuestions", "section-my", "myList");
-  hookToggle("btnMyFavs", "section-fav", "favList");
+  hookToggle("btnMyVotes", "section-voted", "voteList");
 }
 
 function updateNotifications(){
