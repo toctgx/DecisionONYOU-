@@ -241,6 +241,7 @@
   .row-between{display:flex; justify-content:space-between; gap:8px; align-items:center;}
 
   .tabs{display:flex; gap:6px; margin:6px 0 8px; flex-wrap:wrap;}
+  .notice-bar{background:#f3ead7; color:#111; padding:8px 12px; border-radius:12px; font-size:12px; margin:6px 0 8px;}
   .type-toggle{display:flex; flex-direction:column; gap:8px;}
   .type-btn{width:100%;}
   .type-btn.active{outline:1px solid #8e8e93;}
@@ -554,6 +555,7 @@
           <button class="btn" id="sortPopularBtn">THIS / THAT</button>
         </div>
 
+        <div id="noticeBar" class="notice-bar hidden"></div>
 
         <div id="homeFeedArea"></div>
       </div>
@@ -773,7 +775,8 @@ const STORAGE_KEYS = {
   adminLogs: "answerme_admin_logs_v1",
   hiddenQuestions: "answerme_hidden_questions_v1",
   warnings: "answerme_warnings_v1",
-  extraBanned: "answerme_extra_banned_v1"
+  extraBanned: "answerme_extra_banned_v1",
+  adminNotice: "answerme_admin_notice_v1"
 };
 
 
@@ -916,6 +919,7 @@ let hiddenQuestions = {};
 let warnings = {};
 let extraBanned = [];
 let adminContentSearchTerm = "";
+let adminNotice = "";
 
 function makeId(){
   return "q_" + Math.random().toString(36).slice(2,10) + Date.now().toString(36);
@@ -955,6 +959,7 @@ function initData(){
   hiddenQuestions = loadLocal(STORAGE_KEYS.hiddenQuestions, {});
   warnings = loadLocal(STORAGE_KEYS.warnings, {});
   extraBanned = loadLocal(STORAGE_KEYS.extraBanned, []);
+  adminNotice = loadLocal(STORAGE_KEYS.adminNotice, "");
   session = loadLocal(STORAGE_KEYS.session, {
     sort: "latest",
     currentQueue: [],
@@ -1029,6 +1034,10 @@ function initData(){
     extraBanned = [];
     saveLocal(STORAGE_KEYS.extraBanned, extraBanned);
   }
+  if(typeof adminNotice !== "string"){
+    adminNotice = "";
+    saveLocal(STORAGE_KEYS.adminNotice, adminNotice);
+  }
 
   const seeded = loadLocal(STORAGE_KEYS.commentsSeeded, false);
   if(!seeded){
@@ -1093,6 +1102,7 @@ function openApp(){
   }
   updateCounts();
   showScreen("home");
+  renderNotice();
   safeRenderFeed();
   renderMyPage();
   updateNotifications();
@@ -1142,6 +1152,10 @@ function showScreen(name){
     stopAskCountdown();
   } else {
     stopAskCountdown();
+  }
+
+  if(name === "home"){
+    renderNotice();
   }
 }
 
@@ -1875,6 +1889,19 @@ function renderNotifications(){
   `).join("");
 }
 
+function renderNotice(){
+  const bar = document.getElementById("noticeBar");
+  if(!bar) return;
+  const text = (adminNotice || "").trim();
+  if(!text){
+    bar.classList.add("hidden");
+    bar.textContent = "";
+    return;
+  }
+  bar.classList.remove("hidden");
+  bar.textContent = text;
+}
+
 function addAdminLog(action, detail){
   adminLogs.unshift({ action, detail, at: Date.now() });
   adminLogs = adminLogs.slice(0, 50);
@@ -1903,12 +1930,23 @@ function renderAdminContentResults(term){
     wrap.innerHTML = `<div class="muted">검색어를 입력하세요.</div>`;
     return;
   }
-  const list = questions.filter(q => q.q.includes(term));
-  if(list.length === 0){
+  const qList = questions.filter(q => q.q.includes(term));
+  const cList = [];
+  Object.entries(comments).forEach(([qid, list]) => {
+    list.forEach(c => {
+      if(String(c.text || "").includes(term)){
+        const q = questions.find(x => x.id === qid) || { q: "(삭제됨)", author: "unknown" };
+        cList.push({ qid, q, c });
+      }
+    });
+  });
+
+  if(qList.length === 0 && cList.length === 0){
     wrap.innerHTML = `<div class="muted">검색 결과가 없습니다.</div>`;
     return;
   }
-  wrap.innerHTML = list.map(q => `
+
+  const qHtml = qList.map(q => `
     <div class="card">
       <div class="q-title" style="font-size:13px;">Q. ${escapeHtml(q.q)}</div>
       <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
@@ -1918,6 +1956,18 @@ function renderAdminContentResults(term){
       </div>
     </div>
   `).join("");
+
+  const cHtml = cList.map(item => `
+    <div class="card">
+      <div class="q-title" style="font-size:13px;">댓글: ${escapeHtml(item.c.text)}</div>
+      <div class="muted">질문: ${escapeHtml(item.q.q)}</div>
+    </div>
+  `).join("");
+
+  wrap.innerHTML = `
+    ${qHtml ? `<div class="muted">질문 결과</div>${qHtml}` : ""}
+    ${cHtml ? `<div class="muted" style="margin-top:6px;">댓글 결과</div>${cHtml}` : ""}
+  `;
 
   wrap.querySelectorAll("button").forEach(btn => {
     if(btn.dataset.hide){
@@ -1981,15 +2031,23 @@ function renderAdminStats(){
 function renderAdminSettings(){
   const wrap = document.getElementById("adminSettingsList");
   if(!wrap) return;
-  if(!extraBanned || extraBanned.length === 0){
-    wrap.innerHTML = `<div class="muted">추가 금지어 없음</div>`;
-    return;
-  }
-  wrap.innerHTML = extraBanned.map(w => `
+  const notice = (adminNotice || "").trim();
+  const noticeBlock = notice ? `
     <div class="card">
-      <div class="q-title" style="font-size:13px;">${escapeHtml(w)}</div>
+      <div class="q-title" style="font-size:13px;">공지</div>
+      <div class="muted">${escapeHtml(notice)}</div>
     </div>
-  `).join("");
+  ` : `<div class="muted">공지 없음</div>`;
+
+  const bannedBlock = (!extraBanned || extraBanned.length === 0)
+    ? `<div class="muted">추가 금지어 없음</div>`
+    : extraBanned.map(w => `
+        <div class="card">
+          <div class="q-title" style="font-size:13px;">${escapeHtml(w)}</div>
+        </div>
+      `).join("");
+
+  wrap.innerHTML = `${noticeBlock}${bannedBlock}`;
 }
 
 function renderAdmin(){
@@ -2111,7 +2169,11 @@ function renderAdmin(){
     noticeBtn.onclick = () => {
       const msg = prompt("공지 내용을 입력하세요");
       if(!msg) return;
+      adminNotice = msg;
+      saveLocal(STORAGE_KEYS.adminNotice, adminNotice);
       addAdminLog("공지 설정", msg);
+      renderAdminSettings();
+      renderNotice();
       alert("공지 저장됨");
     };
   }
