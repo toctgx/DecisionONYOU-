@@ -2069,8 +2069,10 @@ function renderAdmin(){
   const noticeBtn = document.getElementById("adminNoticeBtn");
   const bindAdminBtn = (btn, handler) => {
     if(!btn) return;
-    btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); handler(); };
-    btn.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); handler(); }, {passive:false});
+    btn.type = "button";
+    btn.onclick = null;
+    btn.addEventListener("click", handler);
+    btn.addEventListener("pointerup", handler);
   };
   bindAdminBtn(manageBannedBtn, () => {
     const word = prompt("추가할 금지어를 입력하세요");
