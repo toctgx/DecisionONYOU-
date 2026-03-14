@@ -1932,6 +1932,21 @@ document.querySelectorAll('.type-btn').forEach(btn => {
   });
 });
 
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#notifyBtn');
+  if(!btn) return;
+  showScreen('notifications');
+  renderNotifications();
+});
+
+document.addEventListener('touchstart', (e) => {
+  const btn = e.target.closest('#notifyBtn');
+  if(!btn) return;
+  e.preventDefault();
+  showScreen('notifications');
+  renderNotifications();
+}, {passive:false});
+
 resetAskBtn.addEventListener("click", () => {
   questionInput.value = "";
   questionCount.textContent = "0";
