@@ -1796,11 +1796,21 @@ function renderMyPage(){
     wrap.className = "card";
     wrap.id = `section-${key}`;
     wrap.innerHTML = `
-      <div class="small" style="margin-bottom:6px;">${sec.title}</div>
+      <div class="row-between" style="margin-bottom:6px; cursor:pointer;" data-toggle>
+        <span class="small">${sec.title}</span>
+        <span class="small">열기</span>
+      </div>
       <div id="${sec.listId}" style="display:none;"></div>
     `;
     const listEl = wrap.querySelector(`#${sec.listId}`);
-    if(key === "voted") listEl.style.display = "block";
+    const toggle = wrap.querySelector('[data-toggle]');
+    if(toggle){
+      toggle.addEventListener('click', () => {
+        const isOpen = listEl.style.display === 'block';
+        listEl.style.display = isOpen ? 'none' : 'block';
+        toggle.querySelector('span:last-child').textContent = isOpen ? '열기' : '닫기';
+      });
+    }
 
     sec.items.forEach(q => {
       const total = q.v1 + q.v2;
