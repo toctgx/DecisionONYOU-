@@ -367,7 +367,7 @@
   .modal .modal-actions .btn{flex:1;}
   .comment-modal .modal-card{padding:14px; display:flex; flex-direction:column; height:80vh; overflow:hidden;}
   .comment-header{font-weight:900; text-align:center; margin-bottom:10px;}
-  .comment-list{flex:1; min-height:0; overflow-y:auto; padding-right:4px; -webkit-overflow-scrolling:touch;}
+  .comment-list{flex:1; min-height:0; overflow-y:scroll; padding-right:4px; -webkit-overflow-scrolling:touch; scrollbar-gutter:stable;}
   .comment-item{display:flex; gap:10px; padding:10px 0; border-bottom:1px solid #eee;}
   .comment-avatar{width:36px;height:36px;border-radius:50%;background:#ddd;flex:0 0 36px;}
   .comment-body{flex:1;}
@@ -1313,10 +1313,13 @@ function renderFeed(){
       document.body.classList.add("no-scroll");
 
       const onModalTouch = (e) => {
-        if(commentModalList && commentModalList.contains(e.target)) return;
+        if(e.target.closest('#commentModalList')) return;
         e.preventDefault();
       };
       commentModal.addEventListener('touchmove', onModalTouch, {passive:false});
+      if(commentModalList){
+        commentModalList.style.overflowY = 'scroll';
+      }
 
       commentModalSubmit.onclick = () => {
         const text = sanitize(commentModalInput.value);
