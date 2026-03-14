@@ -1849,8 +1849,8 @@ function renderMyPage(){
   };
 
   const myWrap = makeSection("my");
-  const favWrap = makeSection("fav");
-  [myWrap, favWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
+  const votedWrap = makeSection("voted");
+  [myWrap, votedWrap].forEach(w => { if(w) myQuestionList.appendChild(w); });
 
   const hookToggle = (btnId, sectionId, listId) => {
     const btn = document.getElementById(btnId);
@@ -1859,7 +1859,8 @@ function renderMyPage(){
     btn.onclick = () => {
       const listEl = section.querySelector(`#${listId}`);
       if(!listEl) return;
-      listEl.style.display = "block";
+      const isOpen = listEl.style.display === "block";
+      listEl.style.display = isOpen ? "none" : "block";
       section.scrollIntoView({behavior:"smooth", block:"start"});
     };
   };
