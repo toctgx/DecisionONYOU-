@@ -1974,7 +1974,7 @@ function addAdminLog(action, detail){
 function renderAdminLogs(){
   const logWrap = document.getElementById("adminLogList");
   if(!logWrap) return;
-  const filtered = adminLogs.filter(l => !["신고 해제","숨김 해제","콘텐츠 복구","숨김 해제"].includes(l.action));
+  const filtered = adminLogs.filter(l => !["신고 해제","숨김 해제","콘텐츠 복구","숨김 해제","금지어 추가"].includes(l.action));
   if(filtered.length === 0){
     logWrap.innerHTML = `<div class="muted">처리 로그가 없습니다.</div>`;
     return;
