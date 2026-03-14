@@ -647,7 +647,6 @@
           <div class="small">파일럿 기준 기본 관리 기능</div>
           <div class="admin-tabs">
             <button class="admin-tab-btn active" data-admin-tab="reports">신고/검수</button>
-            <button class="admin-tab-btn" data-admin-tab="users">사용자</button>
             <button class="admin-tab-btn" data-admin-tab="stats">통계</button>
             <button class="admin-tab-btn" data-admin-tab="settings">설정</button>
           </div>
@@ -678,23 +677,6 @@
               </div>
               <div class="admin-section-body">
                 <div id="adminLogList" style="margin-top:10px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="admin-tab-content" data-admin-content="users">
-          <div class="admin-grid">
-            <div class="admin-card admin-section" data-section>
-              <div class="admin-section-header">
-                <div>
-                  <div class="admin-title">신고 닉네임</div>
-                  <div class="admin-desc">신고된 글의 작성자 목록</div>
-                </div>
-                <button class="btn" id="adminShowReportedUsers">닉네임 보기</button>
-              </div>
-              <div class="admin-section-body">
-                <div id="adminUserResults" style="margin-top:10px; display:none;"></div>
               </div>
             </div>
           </div>
@@ -1153,6 +1135,14 @@ function openApp(){
   if(splashWindow) splashWindow.classList.add("hidden");
   exitWindow.classList.add("hidden");
   welcomeWindow.classList.add("hidden");
+
+  const banInfo = bannedUsers[currentProfile.nickname];
+  if(banInfo && banInfo.bannedUntil && Date.now() < banInfo.bannedUntil){
+    const left = Math.ceil((banInfo.bannedUntil - Date.now()) / (24*60*60*1000));
+    alert(`이용이 제한되었습니다. ${left}일 후 재이용 가능합니다.`);
+    return;
+  }
+
   appWindow.classList.remove("hidden");
   myNickLabel.textContent = currentProfile.nickname;
   session.currentIndex = 0;
@@ -1163,6 +1153,13 @@ function openApp(){
     session.currentIndex = 0;
     buildQueueIfNeeded(true);
   }
+
+  if(warnings[currentProfile.nickname]){
+    alert("경고가 누적되었습니다. 이용 시 주의해주세요.");
+    warnings[currentProfile.nickname] = Math.max(0, warnings[currentProfile.nickname] - 1);
+    saveLocal(STORAGE_KEYS.warnings, warnings);
+  }
+
   updateCounts();
   showScreen("home");
   renderNotice();
@@ -2118,7 +2115,8 @@ function renderAdmin(){
         <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
         <div class="home-actions" style="margin-top:10px;">
           <button class="btn btn-danger" data-action="delete" data-id="${id}">삭제</button>
-          <button class="btn" data-action="ban" data-author="${escapeHtml(q.author || "unknown")}">이용중지</button>
+          <button class="btn" data-action="warn" data-author="${escapeHtml(q.author || "unknown")}">경고</button>
+          <button class="btn" data-action="ban" data-author="${escapeHtml(q.author || "unknown")}">차단</button>
         </div>
       `;
       adminReportList.appendChild(card);
@@ -2136,10 +2134,19 @@ function renderAdmin(){
           addAdminLog("콘텐츠 삭제", id);
           renderAdmin();
         }
+        if(action === "warn"){
+          const author = btn.dataset.author;
+          if(author && author !== "unknown"){
+            warnings[author] = (warnings[author] || 0) + 1;
+            saveLocal(STORAGE_KEYS.warnings, warnings);
+            addAdminLog("사용자 경고", author);
+          }
+          renderAdmin();
+        }
         if(action === "ban"){
           const author = btn.dataset.author;
           if(author && author !== "unknown"){
-            bannedUsers[author] = { bannedAt: Date.now() };
+            bannedUsers[author] = { bannedAt: Date.now(), bannedUntil: Date.now() + 15 * 24 * 60 * 60 * 1000 };
             saveLocal(STORAGE_KEYS.banned, bannedUsers);
             addAdminLog("사용자 차단", author);
           }
