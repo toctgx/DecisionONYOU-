@@ -699,7 +699,8 @@ const STORAGE_KEYS = {
   shuffled: "answerme_shuffled_v1",
   cleared: "answerme_cleared_v1",
   clearedCompare: "answerme_cleared_compare_v1",
-  commentsSeeded: "answerme_comments_seeded_v1"
+  commentsSeeded: "answerme_comments_seeded_v1",
+  lastSeenComments: "answerme_last_seen_comments_v1"
 };
 
 
@@ -1694,18 +1695,29 @@ function updateNotifications(){
       e.stopPropagation();
       showScreen("notifications");
       renderNotifications();
+      const last = Date.now();
+      saveLocal(STORAGE_KEYS.lastSeenComments, last);
+      if(dot) dot.style.display = "none";
     });
     btn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       e.stopPropagation();
       showScreen("notifications");
       renderNotifications();
+      const last = Date.now();
+      saveLocal(STORAGE_KEYS.lastSeenComments, last);
+      if(dot) dot.style.display = "none";
     }, {passive:false});
   }
   if(!dot) return;
+  const lastSeen = loadLocal(STORAGE_KEYS.lastSeenComments, 0);
   const myIds = questions.filter(q => q.author === currentProfile.nickname).map(q => q.id);
-  const hasComments = myIds.some(id => (comments[id] || []).length > 0);
-  dot.style.display = hasComments ? "block" : "none";
+  const newest = myIds.reduce((acc, id) => {
+    const list = comments[id] || [];
+    const latest = list[0]?.createdAt || 0;
+    return Math.max(acc, latest);
+  }, 0);
+  dot.style.display = newest > lastSeen ? "block" : "none";
 }
 
 function openReportModal(q){
