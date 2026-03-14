@@ -2087,10 +2087,10 @@ function renderAdminSettings(){
       <div class="q-title" style="font-size:13px;">공지</div>
       <div class="muted">${escapeHtml(notice)}</div>
     </div>
-  ` : `<div class="muted">공지 없음</div>`;
+  ` : "";
 
   const bannedBlock = (!extraBanned || extraBanned.length === 0)
-    ? `<div class="muted">추가 금지어 없음</div>`
+    ? ""
     : extraBanned.map(w => `
         <div class="card">
           <div class="q-title" style="font-size:13px;">${escapeHtml(w)}</div>
