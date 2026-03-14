@@ -2067,30 +2067,31 @@ function renderAdmin(){
 
   const manageBannedBtn = document.getElementById("adminManageBannedBtn");
   const noticeBtn = document.getElementById("adminNoticeBtn");
-  if(manageBannedBtn){
-    manageBannedBtn.onclick = () => {
-      const word = prompt("추가할 금지어를 입력하세요");
-      const clean = sanitize(word || "");
-      if(!clean) return;
-      extraBanned.push(clean);
-      saveLocal(STORAGE_KEYS.extraBanned, extraBanned);
-      addAdminLog("금지어 추가", clean);
-      renderAdminSettings();
-    };
-  }
-  if(noticeBtn){
-    noticeBtn.onclick = () => {
-      const msg = prompt("공지 내용을 입력하세요");
-      const clean = sanitize(msg || "");
-      if(!clean) return;
-      adminNotice = clean;
-      saveLocal(STORAGE_KEYS.adminNotice, adminNotice);
-      addAdminLog("공지 설정", clean);
-      renderAdminSettings();
-      renderNotice();
-      alert("공지 저장됨");
-    };
-  }
+  const bindAdminBtn = (btn, handler) => {
+    if(!btn) return;
+    btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); handler(); };
+    btn.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); handler(); }, {passive:false});
+  };
+  bindAdminBtn(manageBannedBtn, () => {
+    const word = prompt("추가할 금지어를 입력하세요");
+    const clean = sanitize(word || "");
+    if(!clean) return;
+    extraBanned.push(clean);
+    saveLocal(STORAGE_KEYS.extraBanned, extraBanned);
+    addAdminLog("금지어 추가", clean);
+    renderAdminSettings();
+  });
+  bindAdminBtn(noticeBtn, () => {
+    const msg = prompt("공지 내용을 입력하세요");
+    const clean = sanitize(msg || "");
+    if(!clean) return;
+    adminNotice = clean;
+    saveLocal(STORAGE_KEYS.adminNotice, adminNotice);
+    addAdminLog("공지 설정", clean);
+    renderAdminSettings();
+    renderNotice();
+    alert("공지 저장됨");
+  });
 
   const showReportsBtn = document.getElementById("adminShowReports");
   const showLogsBtn = document.getElementById("adminShowLogs");
