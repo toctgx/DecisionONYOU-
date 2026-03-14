@@ -1003,7 +1003,7 @@ function makeDraggable(win){
 function showScreen(name){
   Object.values(screens).forEach(el => el.classList.add("hidden"));
   screens[name].classList.remove("hidden");
-  statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : name === "notifications" ? "알림" : "마이페이지";
+  statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : name === "notifications" ? "댓글" : "마이페이지";
 
   if(name === "ask"){
     questionType.value = "";
@@ -1705,7 +1705,7 @@ function renderNotifications(){
     wrap.innerHTML = `
       <div class="empty-box">
         아직 표시할 내용이 없습니다
-        <div class="footer-note">회원님의 콘텐츠에 달린 댓글 알림이 여기 표시됩니다.</div>
+        <div class="footer-note">회원님의 콘텐츠에 달린 댓글이 여기 표시됩니다.</div>
       </div>
     `;
     return;
