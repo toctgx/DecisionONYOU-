@@ -357,6 +357,7 @@
     position:fixed; inset:0; background:rgba(0,0,0,.4);
     display:none; align-items:center; justify-content:center; z-index:50;
   }
+  .no-scroll{overflow:hidden; height:100vh;}
   .modal .modal-card{
     background:#fff; color:#111; border-radius:14px; padding:16px; width:min(92vw,420px);
   }
@@ -673,7 +674,7 @@
 </div>
 
 <div class="modal comment-modal" id="commentModal">
-  <div class="modal-card">
+  <div class="modal-card" id="commentModalCard">
     <div class="comment-header">댓글</div>
     <div class="comment-list" id="commentModalList"></div>
     <div class="comment-cta">댓글에 참여하세요</div>
@@ -1311,6 +1312,7 @@ function renderFeed(){
       if(!commentModal) return;
       renderComments(q.id, commentModalList);
       commentModal.style.display = "flex";
+      document.body.classList.add("no-scroll");
       commentModalSubmit.onclick = () => {
         const text = sanitize(commentModalInput.value);
         if(!text) return;
@@ -1327,7 +1329,14 @@ function renderFeed(){
         renderComments(q.id, commentModalList);
         updateNotifications();
       };
-      commentModalClose.onclick = () => { commentModal.style.display = "none"; };
+      commentModalClose.onclick = () => {
+        commentModal.style.display = "none";
+        document.body.classList.remove("no-scroll");
+      };
+      commentModal.addEventListener('touchmove', (e) => {
+        if(commentModalList && commentModalList.contains(e.target)) return;
+        e.preventDefault();
+      }, {passive:false});
     });
   }
 
