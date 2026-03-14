@@ -647,16 +647,6 @@
             <div id="adminLogList" style="margin-top:10px;"></div>
           </div>
 
-          <div class="admin-card">
-            <div class="admin-title">콘텐츠 관리</div>
-            <div class="admin-desc">질문/댓글 검색 및 숨김/복구 관리</div>
-            <input class="admin-input" id="adminContentSearchInput" placeholder="질문/댓글 검색">
-            <div class="admin-actions">
-              <button class="btn" id="adminContentSearchBtn">검색</button>
-              <button class="btn" id="adminContentUnhideBtn">숨김 해제</button>
-            </div>
-            <div id="adminContentResults" style="margin-top:10px;"></div>
-          </div>
 
           <div class="admin-card">
             <div class="admin-title">사용자 관리</div>
@@ -683,9 +673,13 @@
           <div class="admin-card">
             <div class="admin-title">설정</div>
             <div class="admin-desc">금지어 및 운영 공지 관리</div>
+            <input class="admin-input" id="adminBannedInput" placeholder="추가 금지어 입력">
             <div class="admin-actions">
-              <button class="btn" id="adminManageBannedBtn">금지어 관리</button>
-              <button class="btn" id="adminNoticeBtn">공지 설정</button>
+              <button class="btn" id="adminManageBannedBtn">금지어 추가</button>
+            </div>
+            <input class="admin-input" id="adminNoticeInput" placeholder="공지 입력">
+            <div class="admin-actions">
+              <button class="btn" id="adminNoticeBtn">공지 저장</button>
             </div>
             <div id="adminSettingsList" style="margin-top:10px;"></div>
           </div>
@@ -1925,71 +1919,6 @@ function renderAdminLogs(){
   `).join("");
 }
 
-function renderAdminContentResults(term){
-  const wrap = document.getElementById("adminContentResults");
-  if(!wrap) return;
-  if(!term){
-    wrap.innerHTML = `<div class="muted">검색어를 입력하세요.</div>`;
-    return;
-  }
-  const qList = questions.filter(q => q.q.includes(term));
-  const cList = [];
-  Object.entries(comments).forEach(([qid, list]) => {
-    list.forEach(c => {
-      if(String(c.text || "").includes(term)){
-        const q = questions.find(x => x.id === qid) || { q: "(삭제됨)", author: "unknown" };
-        cList.push({ qid, q, c });
-      }
-    });
-  });
-
-  if(qList.length === 0 && cList.length === 0){
-    wrap.innerHTML = `<div class="muted">검색 결과가 없습니다.</div>`;
-    return;
-  }
-
-  const qHtml = qList.map(q => `
-    <div class="card">
-      <div class="q-title" style="font-size:13px;">Q. ${escapeHtml(q.q)}</div>
-      <div class="muted">작성자: ${escapeHtml(q.author || "unknown")}</div>
-      <div class="home-actions" style="margin-top:8px;">
-        <button class="btn" data-hide="${q.id}">숨김</button>
-        <button class="btn" data-unhide="${q.id}">숨김 해제</button>
-      </div>
-    </div>
-  `).join("");
-
-  const cHtml = cList.map(item => `
-    <div class="card">
-      <div class="q-title" style="font-size:13px;">댓글: ${escapeHtml(item.c.text)}</div>
-      <div class="muted">질문: ${escapeHtml(item.q.q)}</div>
-    </div>
-  `).join("");
-
-  wrap.innerHTML = `
-    ${qHtml ? `<div class="muted">질문 결과</div>${qHtml}` : ""}
-    ${cHtml ? `<div class="muted" style="margin-top:6px;">댓글 결과</div>${cHtml}` : ""}
-  `;
-
-  wrap.querySelectorAll("button").forEach(btn => {
-    if(btn.dataset.hide){
-      btn.addEventListener("click", () => {
-        hiddenQuestions[btn.dataset.hide] = true;
-        saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
-        addAdminLog("콘텐츠 숨김", btn.dataset.hide);
-        renderAdminContentResults(term);
-      });
-    }
-    if(btn.dataset.unhide){
-      btn.addEventListener("click", () => {
-        delete hiddenQuestions[btn.dataset.unhide];
-        saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
-        addAdminLog("콘텐츠 복구", btn.dataset.unhide);
-        renderAdminContentResults(term);
-      });
-    }
-  });
-}
 
 function renderAdminUserResults(term){
   const wrap = document.getElementById("adminUserResults");
@@ -2109,24 +2038,6 @@ function renderAdmin(){
   renderAdminStats();
   renderAdminSettings();
 
-  const contentInput = document.getElementById("adminContentSearchInput");
-  const contentBtn = document.getElementById("adminContentSearchBtn");
-  const contentUnhideBtn = document.getElementById("adminContentUnhideBtn");
-  if(contentBtn){
-    contentBtn.onclick = () => {
-      adminContentSearchTerm = sanitize(contentInput.value || "");
-      renderAdminContentResults(adminContentSearchTerm);
-    };
-  }
-  if(contentUnhideBtn){
-    contentUnhideBtn.onclick = () => {
-      hiddenQuestions = {};
-      saveLocal(STORAGE_KEYS.hiddenQuestions, hiddenQuestions);
-      addAdminLog("숨김 해제", "전체");
-      renderAdminContentResults(adminContentSearchTerm);
-    };
-  }
-
   const userInput = document.getElementById("adminUserSearchInput");
   const userWarnBtn = document.getElementById("adminUserWarnBtn");
   const userBanBtn = document.getElementById("adminUserBanBtn");
@@ -2157,25 +2068,29 @@ function renderAdmin(){
 
   const manageBannedBtn = document.getElementById("adminManageBannedBtn");
   const noticeBtn = document.getElementById("adminNoticeBtn");
+  const bannedInput = document.getElementById("adminBannedInput");
+  const noticeInput = document.getElementById("adminNoticeInput");
   if(manageBannedBtn){
     manageBannedBtn.onclick = () => {
-      const word = prompt("추가할 금지어를 입력하세요");
+      const word = sanitize((bannedInput && bannedInput.value) || "");
       if(!word) return;
       extraBanned.push(word);
       saveLocal(STORAGE_KEYS.extraBanned, extraBanned);
       addAdminLog("금지어 추가", word);
+      if(bannedInput) bannedInput.value = "";
       renderAdminSettings();
     };
   }
   if(noticeBtn){
     noticeBtn.onclick = () => {
-      const msg = prompt("공지 내용을 입력하세요");
+      const msg = sanitize((noticeInput && noticeInput.value) || "");
       if(!msg) return;
       adminNotice = msg;
       saveLocal(STORAGE_KEYS.adminNotice, adminNotice);
       addAdminLog("공지 설정", msg);
       renderAdminSettings();
       renderNotice();
+      if(noticeInput) noticeInput.value = "";
       alert("공지 저장됨");
     };
   }
