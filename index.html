@@ -699,7 +699,8 @@ const STORAGE_KEYS = {
   favorites: "answerme_favorites_v1",
   shuffled: "answerme_shuffled_v1",
   cleared: "answerme_cleared_v1",
-  clearedCompare: "answerme_cleared_compare_v1"
+  clearedCompare: "answerme_cleared_compare_v1",
+  commentsSeeded: "answerme_comments_seeded_v1"
 };
 
 
@@ -748,6 +749,15 @@ const compareTitles = [
   "무신사 니트 원피스 vs 플리츠 원피스","무신사 셔츠 원피스 vs 롱 원피스","미니 원피스 vs 슬립 원피스",
   "MZ 테크 팬츠 vs 카고 팬츠","MZ 레이어드 티셔츠 vs 크롭 자켓","MZ 와이드 팬츠 vs 데님 팬츠",
   "MZ 크로스백 vs 토트백","MZ 후디 vs 후드집업","명품 선글라스 vs 명품 스카프","명품 향수 vs 명품 로션"
+];
+
+const seedComments = [
+  "나도 사고싶다","얼마에요?","사이트 공유해줘요","이거 나도 어제봄","무조건 사야지",
+  "색감 예쁘다","실물 궁금해요","저도 살까 고민중","사이즈가 뭐에요?","이거 유명한 제품인가요",
+  "가격만 괜찮으면 살듯","후기 있나요?","선물용으로 좋겠다","이런 스타일 좋아함","재고 있나요?",
+  "나중에 다시 보자","품절 되기 전에 사야지","내일 다시 결정할래","이거 진짜 예쁨","링크 보내주실 수 있나요",
+  "어디서 보셨어요?","이건 컬러가 포인트","배송 얼마나 걸려요","고민하다가 품절될듯","퀄리티 좋아 보임",
+  "이거 탐난다","사진보다 더 예쁠 듯","나도 위시리스트에 넣음","베이직해서 오래 쓸듯","살까 말까 무한반복"
 ];
 
 const defaultQuestions = [
@@ -920,6 +930,22 @@ function initData(){
   if(typeof favorites !== "object" || favorites === null){
     favorites = {};
     saveLocal(STORAGE_KEYS.favorites, favorites);
+  }
+
+  const seeded = loadLocal(STORAGE_KEYS.commentsSeeded, false);
+  if(!seeded){
+    const targetQuestions = questions.filter(q => q.type !== "compare");
+    targetQuestions.forEach(q => {
+      if(!comments[q.id] || comments[q.id].length === 0){
+        comments[q.id] = seedComments.map((text, i) => ({
+          text,
+          author: "seed",
+          createdAt: Date.now() - i * 1000
+        }));
+      }
+    });
+    saveLocal(STORAGE_KEYS.comments, comments);
+    saveLocal(STORAGE_KEYS.commentsSeeded, true);
   }
 }
 
