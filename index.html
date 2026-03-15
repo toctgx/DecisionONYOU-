@@ -1808,6 +1808,10 @@ function moveNextImmediate(){
 function renderMyPage(){
   updateCounts();
 
+  const savedProfile = loadLocal(STORAGE_KEYS.profile, currentProfile);
+  if(savedProfile && savedProfile.nickname){
+    currentProfile.nickname = savedProfile.nickname;
+  }
   nicknameEdit.value = currentProfile.nickname || "";
 
   const myQuestions = [...questions]
