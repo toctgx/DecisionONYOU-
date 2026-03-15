@@ -1025,13 +1025,6 @@ function initData(){
     saveLocal(STORAGE_KEYS.cleared, true);
   }
 
-  const clearedCompareOnce = loadLocal(STORAGE_KEYS.clearedCompare, false);
-  if(!clearedCompareOnce && Array.isArray(questions) && questions.length > 0){
-    questions = questions.filter(q => q.type !== "compare");
-    saveLocal(STORAGE_KEYS.questions, questions);
-    saveLocal(STORAGE_KEYS.clearedCompare, true);
-  }
-
   const shuffledOnce = loadLocal(STORAGE_KEYS.shuffled, false);
   if(!shuffledOnce && Array.isArray(questions) && questions.length > 0){
     questions = shuffleArray(questions);
@@ -1560,6 +1553,7 @@ function renderFeed(){
     vote2Btn.disabled = true;
     renderComments(q.id, commentList);
     if(nextBtn) nextBtn.addEventListener("click", () => moveNextWithSwipe(questionCard));
+    setTimeout(() => moveNextWithSwipe(questionCard), 200);
   }else{
     canVote = true;
     vote1Btn.disabled = false;
