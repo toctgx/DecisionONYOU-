@@ -824,7 +824,8 @@ const STORAGE_KEYS = {
   warnings: "answerme_warnings_v1",
   extraBanned: "answerme_extra_banned_v1",
   adminNotice: "answerme_admin_notice_v1",
-  votesClearedAt: "answerme_votes_cleared_at_v1"
+  votesClearedAt: "answerme_votes_cleared_at_v1",
+  questionsClearedOnce: "answerme_questions_cleared_once_v1"
 };
 
 
@@ -1093,6 +1094,13 @@ function initData(){
     votes = {};
     saveLocal(STORAGE_KEYS.votes, votes);
     saveLocal(STORAGE_KEYS.votesClearedAt, todayKey);
+  }
+
+  const clearedOnce = loadLocal(STORAGE_KEYS.questionsClearedOnce, false);
+  if(!clearedOnce){
+    questions = [];
+    saveLocal(STORAGE_KEYS.questions, questions);
+    saveLocal(STORAGE_KEYS.questionsClearedOnce, true);
   }
 
   const seeded = loadLocal(STORAGE_KEYS.commentsSeeded, false);
