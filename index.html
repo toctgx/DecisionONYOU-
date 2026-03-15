@@ -2613,6 +2613,9 @@ submitQuestionBtn.addEventListener("click", (e) => {
       saveLocal(STORAGE_KEYS.questions, questions);
       buildQueueIfNeeded(false);
       updateCounts();
+      if(myQuestionCount){
+        myQuestionCount.textContent = questions.filter(q => q.author === currentProfile.nickname).length;
+      }
       renderMyPage();
 
       questionInput.value = "";
@@ -2657,6 +2660,9 @@ submitQuestionBtn.addEventListener("click", (e) => {
       saveLocal(STORAGE_KEYS.questions, questions);
       buildQueueIfNeeded(false);
       updateCounts();
+      if(myQuestionCount){
+        myQuestionCount.textContent = questions.filter(q => q.author === currentProfile.nickname).length;
+      }
       renderMyPage();
 
       questionInput.value = "";
