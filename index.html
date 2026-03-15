@@ -1050,8 +1050,8 @@ function initData(){
   if(!currentProfile.region) currentProfile.region = "Seoul";
   if(!currentProfile.lastNickChangeAt) currentProfile.lastNickChangeAt = 0;
 
-  if(!Array.isArray(questions) || questions.length === 0){
-    questions = [...defaultQuestions];
+  if(!Array.isArray(questions)){
+    questions = [];
     saveLocal(STORAGE_KEYS.questions, questions);
   }
 
@@ -2440,14 +2440,6 @@ saveProfileBtn.addEventListener("click", () => {
   if(!loadLocal(STORAGE_KEYS.questions, null)){
     saveLocal(STORAGE_KEYS.questions, questions);
   }
-
-  // reset user-registered questions to defaults only
-  questions = [...defaultQuestions];
-  votes = {};
-  comments = {};
-  saveLocal(STORAGE_KEYS.questions, questions);
-  saveLocal(STORAGE_KEYS.votes, votes);
-  saveLocal(STORAGE_KEYS.comments, comments);
 
   openApp();
 });
