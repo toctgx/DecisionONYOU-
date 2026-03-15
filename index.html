@@ -2459,6 +2459,10 @@ if(saveProfileEditBtn){
 navLinks.forEach(link => {
   link.addEventListener("click", () => {
     const target = link.dataset.nav;
+    if(askMessage){
+      askMessage.textContent = "";
+      askMessage.className = "error";
+    }
     showScreen(target);
     if(target === "home") safeRenderFeed();
     if(target === "my") renderMyPage();
@@ -2493,6 +2497,10 @@ backHomeFromAskBtn.addEventListener("click", () => {
   stopAskCountdown();
   const el = document.getElementById("askCountdown");
   if(el) el.textContent = "";
+  if(askMessage){
+    askMessage.textContent = "";
+    askMessage.className = "error";
+  }
   showScreen("home");
   safeRenderFeed();
 });
