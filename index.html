@@ -612,7 +612,6 @@
 
           <div class="home-actions">
             <button class="btn btn-primary" id="submitQuestionBtn">등록</button>
-            <button class="btn" id="resetAskBtn">내용삭제</button>
             <button class="btn" id="backHomeFromAskBtn">피드로</button>
           </div>
           <div id="askCountdown" class="ask-countdown" aria-live="polite" style="display:none;"></div>
@@ -946,7 +945,6 @@ const questionType = document.getElementById("questionType");
 const compareBlock = document.getElementById("compareBlock");
 
 const submitQuestionBtn = document.getElementById("submitQuestionBtn");
-const resetAskBtn = document.getElementById("resetAskBtn");
 const backHomeFromAskBtn = document.getElementById("backHomeFromAskBtn");
 const askMessage = document.getElementById("askMessage");
 
@@ -1218,6 +1216,10 @@ function showScreen(name){
   }
 
   if(name === "ask"){
+    questionInput.value = "";
+    questionCount.textContent = "0";
+    resetFileInput(imageInput);
+    resetFileInput(imageInput2);
     questionType.value = "";
     compareBlock.style.display = "none";
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -2530,15 +2532,6 @@ document.addEventListener('touchstart', (e) => {
   renderNotifications();
 }, {passive:false});
 
-resetAskBtn.addEventListener("click", () => {
-  questionInput.value = "";
-  questionCount.textContent = "0";
-  askMessage.textContent = "";
-  askMessage.className = "error";
-  stopAskCountdown();
-  const el = document.getElementById("askCountdown");
-  if(el) el.textContent = "";
-});
 
 submitQuestionBtn.addEventListener("click", (e) => {
   e.preventDefault();
