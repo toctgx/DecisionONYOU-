@@ -2622,11 +2622,10 @@ submitQuestionBtn.addEventListener("click", (e) => {
       };
       questions.push(newQuestion);
       saveLocal(STORAGE_KEYS.questions, questions);
-      buildQueueIfNeeded(true);
       updateCounts();
       renderMyPage();
-
       resetAskForm();
+
       session.sort = "latest";
       session.currentIndex = 0;
       buildQueueIfNeeded(true);
@@ -2659,11 +2658,10 @@ submitQuestionBtn.addEventListener("click", (e) => {
 
       questions.push(newQuestion);
       saveLocal(STORAGE_KEYS.questions, questions);
-      buildQueueIfNeeded(true);
       updateCounts();
       renderMyPage();
-
       resetAskForm();
+
       session.sort = "popular";
       session.currentIndex = 0;
       buildQueueIfNeeded(true);
