@@ -1382,6 +1382,10 @@ function renderFeed(){
         </div>
       </div>
     `;
+    const writeFromFeedBtn = document.getElementById("writeFromFeedBtn");
+    if(writeFromFeedBtn){
+      writeFromFeedBtn.addEventListener("click", () => showScreen("ask"));
+    }
     return;
   }
 
