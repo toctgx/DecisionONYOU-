@@ -1736,7 +1736,7 @@ function handleVote(questionId, pick, resultMini, vote1Btn, vote2Btn, nextBtn, c
 
   const questionCard = document.getElementById("questionCard");
   if(nextBtn) nextBtn.onclick = () => moveNextWithSwipe(questionCard);
-  moveNextImmediate();
+  setTimeout(() => moveNextWithSwipe(questionCard), 200);
 }
 
 function renderMiniResult(q, container){
