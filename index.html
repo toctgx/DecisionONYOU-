@@ -442,8 +442,12 @@
     .tabs{margin-bottom:4px;}
   }
 
-  .question-card{transition:transform .45s ease, opacity .45s ease;}
-  .question-card.swipe-out{transform:translateX(60%); opacity:0;}
+  .question-card{transition:none;}
+  .question-card.swipe-out{animation:cardWipe .5s ease forwards;}
+  @keyframes cardWipe{
+    0%{opacity:1; clip-path:inset(0 0 0 0)}
+    100%{opacity:0; clip-path:inset(0 0 0 100%)}
+  }
 
   .empty-box{
     background:#fff;
@@ -1764,7 +1768,7 @@ function moveNextWithSwipe(cardEl){
     session.currentIndex += 1;
     saveSession();
     renderFeed();
-  }, 280);
+  }, 500);
 }
 
 function moveNextImmediate(){
