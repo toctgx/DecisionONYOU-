@@ -990,6 +990,13 @@ function shuffleArray(arr){
   return a;
 }
 
+function resetFileInput(el){
+  if(!el) return;
+  el.value = "";
+  el.type = "";
+  el.type = "file";
+}
+
 function initData(){
   currentProfile = loadLocal(STORAGE_KEYS.profile, TEST_PROFILE);
   questions = loadLocal(STORAGE_KEYS.questions, defaultQuestions);
@@ -2589,7 +2596,7 @@ submitQuestionBtn.addEventListener("click", (e) => {
 
       questionInput.value = "";
       questionCount.textContent = "0";
-      imageInput.value = "";
+      resetFileInput(imageInput);
       questionType.value = "";
       compareBlock.style.display = "none";
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -2634,8 +2641,8 @@ submitQuestionBtn.addEventListener("click", (e) => {
 
       questionInput.value = "";
       questionCount.textContent = "0";
-      imageInput.value = "";
-      imageInput2.value = "";
+      resetFileInput(imageInput);
+      resetFileInput(imageInput2);
       questionType.value = "";
       compareBlock.style.display = "none";
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
