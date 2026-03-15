@@ -7,9 +7,9 @@
   <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@600;700;800&display=swap');
   :root{
-    --desktop:#fdfaf3;
+    --desktop:#f5f7fb;
     --win-gray:#ffffff;
-    --win-light:#faf6ee;
+    --win-light:#f5f7fb;
     --win-dark:#111111;
     --win-black:#111111;
     --title:#111111;
@@ -17,9 +17,9 @@
     --text:#111111;
     --danger:#ff3b30;
     --ok:#2e7d32;
-    --accent:#ff3b3b;
-    --accent2:#2f7bff;
-    --accent3:#f3ead7;
+    --accent:#111111;
+    --accent2:#4f6bff;
+    --accent3:#e9edf7;
   }
 
   *{box-sizing:border-box}
@@ -50,11 +50,12 @@
     max-width:460px;
     background:var(--win-gray);
     border:none;
-    box-shadow:none;
+    box-shadow:0 12px 30px rgba(16,24,40,.08);
     display:flex;
     flex-direction:column;
     position:relative;
     overflow:hidden;
+    border-radius:18px;
   }
   .window::after{display:none;}
   .window > *{position:relative; z-index:1;}
@@ -67,6 +68,10 @@
   .result-toggle{margin-left:auto; font-size:12px; cursor:pointer; color:#bfbfbf;}
   .thumb-grid{display:grid; grid-template-columns:1fr auto 1fr; gap:2px; align-items:center;}
   .thumb-grid .vs{font-weight:700; padding:0 6px; color:#bfbfbf;}
+  .compare-carousel{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;}
+  .compare-carousel::-webkit-scrollbar{display:none;}
+  .compare-slide{min-width:100%; scroll-snap-align:center;}
+  .compare-slide img{width:100%; display:block;}
   .countdot{display:inline-flex; gap:4px; align-items:center;}
   .countdot span{width:6px; height:6px; border-radius:50%; background:#bbb; display:inline-block;}
   .countdot span.on{background:#222;}
@@ -82,17 +87,17 @@
   .window.hidden{display:none}
 
   .titlebar{
-    background:#f3ead7;
+    background:#ffffff;
     color:#111111;
     display:grid;
     grid-template-columns:auto 1fr auto;
     align-items:center;
-    padding:10px 14px;
+    padding:12px 14px;
     font-size:13px;
     font-weight:800;
     letter-spacing:.6px;
     user-select:none;
-    border-bottom:none;
+    border-bottom:1px solid #edf0f5;
     gap:8px;
     position:sticky;
     top:0;
@@ -185,19 +190,19 @@
 
   .panel{
     background:#ffffff;
-    padding:10px;
+    padding:12px;
     margin-bottom:10px;
-    border:none;
-    border-radius:14px;
-    box-shadow:none;
+    border:1px solid #eef1f6;
+    border-radius:16px;
+    box-shadow:0 6px 16px rgba(16,24,40,.06);
   }
 
   .card{
     background:#ffffff;
-    padding:8px;
+    padding:10px;
     margin-bottom:10px;
-    border:none;
-    border-radius:14px;
+    border:1px solid #eef1f6;
+    border-radius:16px;
     box-shadow:none;
   }
   .question-card .card{padding:0; margin-bottom:12px;}
@@ -227,7 +232,7 @@
 
   .muted{color:#444; font-size:12px;}
   .admin-grid{display:grid; gap:12px; margin-top:8px;}
-  .admin-card{background:#fff; border:none; border-radius:14px; padding:14px; box-shadow:none;}
+  .admin-card{background:#f8f9fc; border:1px solid #e6e9f2; border-radius:14px; padding:14px; box-shadow:none;}
   .admin-title{font-weight:800; font-size:14px; margin-bottom:6px;}
   .admin-desc{font-size:12px; color:#6b6b6b; margin-bottom:10px; line-height:1.5;}
   .admin-actions{display:flex; gap:8px; flex-wrap:wrap;}
@@ -244,7 +249,7 @@
   .admin-tab-content{display:none;}
   .admin-tab-content.active{display:block;}
   .admin-section{background:#fff; border-radius:14px; padding:12px;}
-  .admin-section-header{display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer;}
+  .admin-section-header{display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer; padding-bottom:8px; border-bottom:1px solid #e6e9f2;}
   .admin-section-body{margin-top:8px;}
   .admin-section.collapsed .admin-section-body{display:none;}
 
@@ -1401,13 +1406,12 @@ function renderFeed(){
 
       <div class="card" style="background:#fff; padding:0; overflow:hidden;">
         ${q.type === "compare" ? `
-          <div class="thumb-grid">
-            <div>
-              <img src="${q.image || ''}" alt="item1" style="width:100%; display:block;">
+          <div class="compare-carousel" aria-label="THIS/THAT swipe">
+            <div class="compare-slide">
+              <img src="${q.image || ''}" alt="item1">
             </div>
-            <div class="vs">VS</div>
-            <div>
-              <img src="${q.image2 || ''}" alt="item2" style="width:100%; display:block;">
+            <div class="compare-slide">
+              <img src="${q.image2 || ''}" alt="item2">
             </div>
           </div>
         ` : `
