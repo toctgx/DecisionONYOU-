@@ -1356,18 +1356,19 @@ function isNewQuestion(q){
 }
 
 function getCurrentQuestion(){
+  const allAnswered = session.currentQueue.length > 0 && session.currentQueue.every(id => votes[id]);
+  if(allAnswered){
+    session.currentIndex = 0;
+    saveSession();
+    const id = session.currentQueue[0];
+    return questions.find(q => q.id === id) || null;
+  }
+
   while(session.currentIndex < session.currentQueue.length){
     const id = session.currentQueue[session.currentIndex];
     const q = questions.find(q => q.id === id) || null;
     if(q && !votes[id]) return q;
     session.currentIndex += 1;
-  }
-  // 테스트 모드: 모두 답변했으면 반복 표시 (투표 기록 유지)
-  if(session.currentQueue.length){
-    session.currentIndex = 0;
-    saveSession();
-    const id = session.currentQueue[session.currentIndex];
-    return questions.find(q => q.id === id) || null;
   }
   return null;
 }
