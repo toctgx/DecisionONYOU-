@@ -2585,6 +2585,7 @@ submitQuestionBtn.addEventListener("click", () => {
       const ok = confirm("등록 완료");
       if(ok){
         session.sort = "latest";
+        session.currentIndex = 0;
         buildQueueIfNeeded(true);
         showScreen("home");
         safeRenderFeed();
@@ -2628,6 +2629,7 @@ submitQuestionBtn.addEventListener("click", () => {
       const ok = confirm("등록 완료");
       if(ok){
         session.sort = "popular";
+        session.currentIndex = 0;
         buildQueueIfNeeded(true);
         showScreen("home");
         safeRenderFeed();
