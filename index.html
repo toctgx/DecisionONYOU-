@@ -1359,7 +1359,7 @@ function saveSession(){
 
 function isNewQuestion(q){
   if(!q || !q.createdAt) return false;
-  return (Date.now() - q.createdAt) < 24 * 60 * 60 * 1000;
+  return (Date.now() - q.createdAt) < 1 * 60 * 60 * 1000;
 }
 
 function getCurrentQuestion(){
@@ -2501,6 +2501,8 @@ backHomeFromAskBtn.addEventListener("click", () => {
     askMessage.textContent = "";
     askMessage.className = "error";
   }
+  session.currentIndex = 0;
+  buildQueueIfNeeded(true);
   showScreen("home");
   safeRenderFeed();
 });
