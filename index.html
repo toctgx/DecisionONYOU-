@@ -2491,7 +2491,13 @@ sortPopularBtn.addEventListener("click", () => {
 
 
 if(goAskBtn){
-  goAskBtn.addEventListener("click", () => showScreen("ask"));
+  goAskBtn.addEventListener("click", () => {
+    if(askMessage){
+      askMessage.textContent = "";
+      askMessage.className = "error";
+    }
+    showScreen("ask");
+  });
 }
 backHomeFromAskBtn.addEventListener("click", () => {
   stopAskCountdown();
