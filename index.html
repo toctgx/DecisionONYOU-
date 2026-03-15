@@ -1816,6 +1816,8 @@ function renderMyPage(){
 
   const votedIds = Object.keys(votes);
   const votedQuestions = questions.filter(q => votedIds.includes(q.id));
+  if(myQuestionCount) myQuestionCount.textContent = myQuestions.length;
+  if(myVoteCount) myVoteCount.textContent = votedQuestions.length;
   myQuestionList.innerHTML = "";
 
   if(myQuestions.length === 0 && votedQuestions.length === 0){
@@ -2465,7 +2467,7 @@ navLinks.forEach(link => {
     }
     showScreen(target);
     if(target === "home") safeRenderFeed();
-    if(target === "my") renderMyPage();
+    if(target === "my") { renderMyPage(); updateCounts(); }
     if(target === "admin") renderAdmin();
     if(target === "notifications") renderNotifications();
 
