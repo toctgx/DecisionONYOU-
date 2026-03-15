@@ -1229,6 +1229,11 @@ function showScreen(name){
     stopAskCountdown();
   }
 
+  if(askMessage){
+    askMessage.textContent = "";
+    askMessage.className = "error";
+  }
+
   if(name === "home"){
     renderNotice();
   }
