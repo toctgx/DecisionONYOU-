@@ -1355,10 +1355,8 @@ function getCurrentQuestion(){
     if(q && !votes[id]) return q;
     session.currentIndex += 1;
   }
-  // 테스트 모드: 모두 답변했으면 반복 표시
+  // 테스트 모드: 모두 답변했으면 반복 표시 (투표 기록 유지)
   if(session.currentQueue.length){
-    votes = {};
-    saveLocal(STORAGE_KEYS.votes, votes);
     session.currentIndex = 0;
     saveSession();
     const id = session.currentQueue[session.currentIndex];
