@@ -996,6 +996,20 @@ function resetFileInput(el){
   el.type = "file";
 }
 
+function resetAskForm(){
+  questionInput.value = "";
+  questionCount.textContent = "0";
+  resetFileInput(imageInput);
+  resetFileInput(imageInput2);
+  questionType.value = "";
+  compareBlock.style.display = "none";
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  if(askMessage){
+    askMessage.textContent = "";
+    askMessage.className = "error";
+  }
+}
+
 function initData(){
   currentProfile = loadLocal(STORAGE_KEYS.profile, TEST_PROFILE);
   questions = loadLocal(STORAGE_KEYS.questions, defaultQuestions);
@@ -1216,13 +1230,7 @@ function showScreen(name){
   }
 
   if(name === "ask"){
-    questionInput.value = "";
-    questionCount.textContent = "0";
-    resetFileInput(imageInput);
-    resetFileInput(imageInput2);
-    questionType.value = "";
-    compareBlock.style.display = "none";
-    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    resetAskForm();
     if(questionInput) questionInput.placeholder = '예: 지금 안사면 후회할까?';
     stopAskCountdown();
   } else {
@@ -2614,21 +2622,11 @@ submitQuestionBtn.addEventListener("click", (e) => {
       };
       questions.push(newQuestion);
       saveLocal(STORAGE_KEYS.questions, questions);
-      buildQueueIfNeeded(false);
+      buildQueueIfNeeded(true);
       updateCounts();
-      if(myQuestionCount){
-        myQuestionCount.textContent = questions.filter(q => q.author === currentProfile.nickname).length;
-      }
       renderMyPage();
 
-      questionInput.value = "";
-      questionCount.textContent = "0";
-      resetFileInput(imageInput);
-      resetFileInput(imageInput2);
-      questionType.value = "";
-      compareBlock.style.display = "none";
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-      askMessage.textContent = "";
+      resetAskForm();
       session.sort = "latest";
       session.currentIndex = 0;
       buildQueueIfNeeded(true);
@@ -2661,22 +2659,11 @@ submitQuestionBtn.addEventListener("click", (e) => {
 
       questions.push(newQuestion);
       saveLocal(STORAGE_KEYS.questions, questions);
-      buildQueueIfNeeded(false);
+      buildQueueIfNeeded(true);
       updateCounts();
-      if(myQuestionCount){
-        myQuestionCount.textContent = questions.filter(q => q.author === currentProfile.nickname).length;
-      }
       renderMyPage();
 
-      questionInput.value = "";
-      questionCount.textContent = "0";
-      resetFileInput(imageInput);
-      resetFileInput(imageInput2);
-      questionType.value = "";
-      compareBlock.style.display = "none";
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-
-      askMessage.textContent = "";
+      resetAskForm();
       session.sort = "popular";
       session.currentIndex = 0;
       buildQueueIfNeeded(true);
