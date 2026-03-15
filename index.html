@@ -1387,9 +1387,12 @@ function renderFeed(){
   if(!q){
     homeFeedArea.innerHTML = `
       <div class="empty-box">
-        남은 질문이 없습니다.<br>
-        질문을 등록하거나 새로고침해보세요.
-        <div class="footer-note">이미 본 질문은 다시 돌아가지 않습니다.</div>
+        현재 등록된 질문이 없습니다.<br>
+        질문을 등록해주세요.
+        <div class="footer-note">질문 등록 후 바로 홈에 표시됩니다.</div>
+        <div style="margin-top:10px;">
+          <button class="btn" id="writeFromFeedBtn">질문 등록</button>
+        </div>
       </div>
     `;
     return;
