@@ -906,6 +906,7 @@ let countdownValue = 6;
 let askCountdownTimer = null;
 let askCountdownValue = 30;
 let canVote = false;
+let repeatMode = false;
 
 const splashWindow = document.getElementById("splashWindow");
 const exitWindow = document.getElementById("exitWindow");
@@ -1358,11 +1359,13 @@ function isNewQuestion(q){
 function getCurrentQuestion(){
   const allAnswered = session.currentQueue.length > 0 && session.currentQueue.every(id => votes[id]);
   if(allAnswered){
+    repeatMode = true;
     session.currentIndex = 0;
     saveSession();
     const id = session.currentQueue[0];
     return questions.find(q => q.id === id) || null;
   }
+  repeatMode = false;
 
   while(session.currentIndex < session.currentQueue.length){
     const id = session.currentQueue[session.currentIndex];
@@ -1405,7 +1408,7 @@ function renderFeed(){
   }
 
   const total = q.v1 + q.v2;
-  const alreadyVoted = Boolean(votes[q.id]);
+  const alreadyVoted = Boolean(votes[q.id]) && !repeatMode;
   const authorName = q.author || currentProfile.nickname || "anonymous";
   const authorAge = q.authorAge || currentProfile.age || "-";
   const authorGender = q.authorGender || (currentProfile.gender === "male" ? "남" : currentProfile.gender === "female" ? "여" : "-");
@@ -1723,6 +1726,14 @@ function handleVote(questionId, pick, resultMini, vote1Btn, vote2Btn, nextBtn, c
   if(!canVote) return;
   const q = questions.find(item => item.id === questionId);
   if(!q) return;
+
+  // 반복 모드에서는 투표 기록 유지하면서 다음으로 넘김
+  if(votes[questionId] && repeatMode){
+    const questionCard = document.getElementById("questionCard");
+    if(nextBtn) nextBtn.onclick = () => moveNextWithSwipe(questionCard);
+    return setTimeout(() => moveNextWithSwipe(questionCard), 200);
+  }
+
   if(votes[questionId]) return;
 
   if(pick === 1) q.v1 += 1;
@@ -2598,6 +2609,7 @@ submitQuestionBtn.addEventListener("click", (e) => {
       questionInput.value = "";
       questionCount.textContent = "0";
       resetFileInput(imageInput);
+      resetFileInput(imageInput2);
       questionType.value = "";
       compareBlock.style.display = "none";
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
