@@ -2576,7 +2576,7 @@ submitQuestionBtn.addEventListener("click", () => {
         session.sort = "latest";
         buildQueueIfNeeded(true);
         showScreen("home");
-        renderFeed();
+        safeRenderFeed();
       }
       return;
     }
@@ -2619,7 +2619,7 @@ submitQuestionBtn.addEventListener("click", () => {
         session.sort = "popular";
         buildQueueIfNeeded(true);
         showScreen("home");
-        renderFeed();
+        safeRenderFeed();
       }
     };
     reader2.readAsDataURL(file2);
