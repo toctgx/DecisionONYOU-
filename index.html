@@ -1809,6 +1809,7 @@ function renderMyPage(){
       <div id="${sec.listId}" style="display:none;"></div>
     `;
     const listEl = wrap.querySelector(`#${sec.listId}`);
+    if(key === "my") listEl.style.display = "block";
 
     sec.items.forEach(q => {
       const total = q.v1 + q.v2;
