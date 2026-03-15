@@ -888,16 +888,7 @@ const seedComments = [
   "이거 탐난다","사진보다 더 예쁠 듯","나도 위시리스트에 넣음","베이직해서 오래 쓸듯","살까 말까 무한반복"
 ];
 
-const defaultQuestions = [
-  ...singleTitles.map((title, idx) => ({
-    id: makeId(), type: "single", q: `${title}, 사? 말아?`, image: itemSvg("ITEM"),
-    a1: "사라", a2: "마라", v1: 0, v2: 0, author: "seed", createdAt: Date.now() - (100000 - idx * 1000)
-  })),
-  ...compareTitles.map((title, idx) => ({
-    id: makeId(), type: "compare", q: title, image: compareSvg("THIS"), image2: compareSvg("THAT"),
-    label1: "이것", label2: "저것", a1: "이것", a2: "저것", v1: 0, v2: 0, author: "seed", createdAt: Date.now() - (50000 - idx * 1000)
-  }))
-];
+const defaultQuestions = [];
 
 
 let currentProfile = null;
