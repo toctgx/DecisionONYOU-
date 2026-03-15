@@ -1211,6 +1211,12 @@ function showScreen(name){
   screens[name].classList.remove("hidden");
   statusText.textContent = name === "home" ? "Home" : name === "ask" ? "질문하기" : name === "admin" ? "Admin" : name === "notifications" ? "댓글" : "마이페이지";
 
+  // 페이지 이동 시 안내/오류 문구 초기화
+  if(askMessage){
+    askMessage.textContent = "";
+    askMessage.className = "error";
+  }
+
   if(name === "ask"){
     questionType.value = "";
     compareBlock.style.display = "none";
