@@ -2517,7 +2517,8 @@ resetAskBtn.addEventListener("click", () => {
   if(el) el.textContent = "";
 });
 
-submitQuestionBtn.addEventListener("click", () => {
+submitQuestionBtn.addEventListener("click", (e) => {
+  e.preventDefault();
   const q = sanitize(questionInput.value);
   if(bannedUsers[currentProfile.nickname]){
     askMessage.className = "error";
@@ -2577,6 +2578,9 @@ submitQuestionBtn.addEventListener("click", () => {
       questionInput.value = "";
       questionCount.textContent = "0";
       imageInput.value = "";
+      questionType.value = "";
+      compareBlock.style.display = "none";
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
       const ok = confirm("등록 완료");
       if(ok){
         session.sort = "latest";
@@ -2620,6 +2624,9 @@ submitQuestionBtn.addEventListener("click", () => {
       questionCount.textContent = "0";
       imageInput.value = "";
       imageInput2.value = "";
+      questionType.value = "";
+      compareBlock.style.display = "none";
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
 
       const ok = confirm("등록 완료");
       if(ok){
