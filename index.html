@@ -2566,6 +2566,15 @@ submitQuestionBtn.addEventListener("click", (e) => {
   askMessage.textContent = err || "등록되었습니다.";
   if(err) return;
 
+  // 등록 버튼 누르면 즉시 입력 리셋
+  questionInput.value = "";
+  questionCount.textContent = "0";
+  resetFileInput(imageInput);
+  resetFileInput(imageInput2);
+  questionType.value = "";
+  compareBlock.style.display = "none";
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+
   const file1 = imageInput.files[0];
   const reader1 = new FileReader();
   reader1.onload = () => {
