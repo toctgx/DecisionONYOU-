@@ -21,7 +21,7 @@ const STORAGE_KEYS = {
 };
 
 
-const TEST_PROFILE = { nickname: "", gender: "male", age: 0, mbti: "", region: "", password: "", lastNickChangeAt: 0 };
+const TEST_PROFILE = { nickname: "", gender: "male", age: 0, mbti: "", password: "", lastNickChangeAt: 0 };
 
 const bannedWords = [
   "씨발","시발","병신","좆","존나","개새끼","새끼","미친놈","미친년","꺼져","썅","시발놈",
@@ -79,26 +79,6 @@ const seedComments = [
 
 const defaultQuestions = [];
 
-const REGION_OPTIONS = {
-  "서울": ["강남구", "서초구", "송파구", "마포구", "성동구"],
-  "경기": ["성남시", "수원시", "고양시", "용인시", "화성시"],
-  "인천": ["연수구", "남동구", "부평구"],
-  "부산": ["해운대구", "수영구", "부산진구"],
-  "대구": ["수성구", "달서구"],
-  "대전": ["유성구"],
-  "광주": ["서구"],
-  "울산": ["남구"],
-  "세종": ["세종시"],
-  "강원": ["춘천시", "원주시"],
-  "충북": ["청주시"],
-  "충남": ["천안시"],
-  "전북": ["전주시"],
-  "전남": ["순천시"],
-  "경북": ["포항시"],
-  "경남": ["창원시"],
-  "제주": ["제주시"]
-};
-
 let currentProfile = null;
 let questions = [];
 let votes = {};
@@ -124,8 +104,6 @@ const nicknameInput = document.getElementById("nicknameInput");
 const genderSelect = document.getElementById("genderSelect");
 const ageInput = document.getElementById("ageInput");
 const mbtiSelect = document.getElementById("mbtiSelect");
-const regionProvinceSelect = document.getElementById("regionProvinceSelect");
-const regionDistrictSelect = document.getElementById("regionDistrictSelect");
 const passwordInput = document.getElementById("passwordInput");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 const profileMessage = document.getElementById("profileMessage");
@@ -207,48 +185,6 @@ function resetFileInput(el){
   el.type = "file";
 }
 
-function populateRegionProvinceOptions(){
-  if(!regionProvinceSelect) return;
-  regionProvinceSelect.innerHTML = '<option value="">시/도를 선택하세요</option>';
-  Object.keys(REGION_OPTIONS).forEach(province => {
-    const option = document.createElement("option");
-    option.value = province;
-    option.textContent = province;
-    regionProvinceSelect.appendChild(option);
-  });
-}
-
-function populateRegionDistrictOptions(province, selectedDistrict = ""){
-  if(!regionDistrictSelect) return;
-  regionDistrictSelect.innerHTML = '<option value="">군/구/시를 선택하세요</option>';
-  if(!province || !REGION_OPTIONS[province]) return;
-  REGION_OPTIONS[province].forEach(district => {
-    const option = document.createElement("option");
-    option.value = district;
-    option.textContent = district;
-    regionDistrictSelect.appendChild(option);
-  });
-  if(selectedDistrict) regionDistrictSelect.value = selectedDistrict;
-}
-
-function setRegionSelectorsFromValue(regionValue){
-  if(!regionProvinceSelect || !regionDistrictSelect) return;
-  if(!regionValue){
-    regionProvinceSelect.value = "";
-    populateRegionDistrictOptions("");
-    return;
-  }
-  const [province, district] = regionValue.split(" ");
-  regionProvinceSelect.value = province || "";
-  populateRegionDistrictOptions(province || "", district || "");
-}
-
-function getSelectedRegion(){
-  const province = regionProvinceSelect ? regionProvinceSelect.value : "";
-  const district = regionDistrictSelect ? regionDistrictSelect.value : "";
-  return province && district ? `${province} ${district}` : "";
-}
-
 function resetAskForm(){
   questionInput.value = "";
   questionCount.textContent = "0";
@@ -305,7 +241,6 @@ function initData(){
   if(!currentProfile.gender) currentProfile.gender = "male";
   if(!currentProfile.age) currentProfile.age = 24;
   if(!currentProfile.mbti) currentProfile.mbti = "";
-  if(typeof currentProfile.region !== "string") currentProfile.region = "";
   if(!currentProfile.lastNickChangeAt) currentProfile.lastNickChangeAt = 0;
 
   if(!Array.isArray(questions)){
@@ -380,8 +315,6 @@ function boot(){
   ageInput.value = currentProfile.age || "";
   passwordInput.value = currentProfile.password || "";
   if(mbtiSelect) mbtiSelect.value = currentProfile.mbti || "";
-  populateRegionProvinceOptions();
-  setRegionSelectorsFromValue(currentProfile.region || "");
 
   openSplash();
 }
@@ -550,7 +483,7 @@ function maskText(text){
   return out;
 }
 
-function validateProfile(nick, pw, age, region){
+function validateProfile(nick, pw, age){
   if(!nick || nick.length < 2 || nick.length > 12){
     return "닉네임은 2~12자여야 합니다.";
   }
@@ -559,9 +492,6 @@ function validateProfile(nick, pw, age, region){
   }
   if(!age || age < 18){
     return "나이는 18세 이상이어야 합니다.";
-  }
-  if(!region){
-    return "지역을 선택해주세요.";
   }
   if(containsBannedWord(nick)){
     return "닉네임에 부적절한 표현이 포함되어 있습니다.";
@@ -1698,12 +1628,6 @@ function enableSwipe(cardEl, onSwipe){
   cardEl.addEventListener("touchend", end);
 }
 
-if(regionProvinceSelect){
-  regionProvinceSelect.addEventListener("change", () => {
-    populateRegionDistrictOptions(regionProvinceSelect.value);
-  });
-}
-
 saveProfileBtn.addEventListener("click", () => {
   if(consentCheck && !consentCheck.checked){
     profileMessage.className = "error";
@@ -1714,13 +1638,12 @@ saveProfileBtn.addEventListener("click", () => {
   const gender = genderSelect.value;
   const age = parseInt(ageInput.value, 10);
   const mbti = mbtiSelect ? mbtiSelect.value : "";
-  const region = getSelectedRegion();
   const pw = passwordInput.value.trim();
-  const err = validateProfile(nick, pw, age, region);
+  const err = validateProfile(nick, pw, age);
   profileMessage.className = "error";
   profileMessage.textContent = err;
   if(err) return;
-  currentProfile = { nickname: nick, gender, age, mbti, region, password: pw };
+  currentProfile = { nickname: nick, gender, age, mbti, password: pw };
   saveLocal(STORAGE_KEYS.profile, currentProfile);
 
   if(!loadLocal(STORAGE_KEYS.questions, null)){
