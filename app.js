@@ -21,7 +21,7 @@ const STORAGE_KEYS = {
 };
 
 
-const TEST_PROFILE = { nickname: "", gender: "male", age: 0, mbti: "", region: "Seoul", password: "", lastNickChangeAt: 0 };
+const TEST_PROFILE = { nickname: "", gender: "male", age: 0, mbti: "", region: "", password: "", lastNickChangeAt: 0 };
 
 const bannedWords = [
   "씨발","시발","병신","좆","존나","개새끼","새끼","미친놈","미친년","꺼져","썅","시발놈",
@@ -105,6 +105,7 @@ const nicknameInput = document.getElementById("nicknameInput");
 const genderSelect = document.getElementById("genderSelect");
 const ageInput = document.getElementById("ageInput");
 const mbtiSelect = document.getElementById("mbtiSelect");
+const regionSelect = document.getElementById("regionSelect");
 const passwordInput = document.getElementById("passwordInput");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 const profileMessage = document.getElementById("profileMessage");
@@ -242,7 +243,7 @@ function initData(){
   if(!currentProfile.gender) currentProfile.gender = "male";
   if(!currentProfile.age) currentProfile.age = 24;
   if(!currentProfile.mbti) currentProfile.mbti = "";
-  if(!currentProfile.region) currentProfile.region = "Seoul";
+  if(typeof currentProfile.region !== "string") currentProfile.region = "";
   if(!currentProfile.lastNickChangeAt) currentProfile.lastNickChangeAt = 0;
 
   if(!Array.isArray(questions)){
@@ -317,6 +318,7 @@ function boot(){
   ageInput.value = currentProfile.age || "";
   passwordInput.value = currentProfile.password || "";
   if(mbtiSelect) mbtiSelect.value = currentProfile.mbti || "";
+  if(regionSelect) regionSelect.value = currentProfile.region || "";
 
   openSplash();
 }
@@ -494,6 +496,9 @@ function validateProfile(nick, pw, age, region){
   }
   if(!age || age < 18){
     return "나이는 18세 이상이어야 합니다.";
+  }
+  if(!region){
+    return "지역을 선택해주세요.";
   }
   if(containsBannedWord(nick)){
     return "닉네임에 부적절한 표현이 포함되어 있습니다.";
@@ -1640,12 +1645,13 @@ saveProfileBtn.addEventListener("click", () => {
   const gender = genderSelect.value;
   const age = parseInt(ageInput.value, 10);
   const mbti = mbtiSelect ? mbtiSelect.value : "";
+  const region = regionSelect ? regionSelect.value : "";
   const pw = passwordInput.value.trim();
-  const err = validateProfile(nick, pw, age, "ok");
+  const err = validateProfile(nick, pw, age, region);
   profileMessage.className = "error";
   profileMessage.textContent = err;
   if(err) return;
-  currentProfile = { nickname: nick, gender, age, mbti, region: "", password: pw };
+  currentProfile = { nickname: nick, gender, age, mbti, region, password: pw };
   saveLocal(STORAGE_KEYS.profile, currentProfile);
 
   if(!loadLocal(STORAGE_KEYS.questions, null)){
