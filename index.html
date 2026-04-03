@@ -59,23 +59,16 @@
         </select>
         <div class="small">I/E: 내향·외향, S/N: 감각·직관, T/F: 사고·감정, J/P: 판단·인식</div>
 
-        <label class="label" for="regionSelect">지역 (시도/군구)</label>
-        <select id="regionSelect" class="input">
-          <option value="">선택하세요</option>
-          <option>서울 강남구</option><option>서울 서초구</option><option>서울 송파구</option><option>서울 마포구</option><option>서울 성동구</option>
-          <option>경기 성남시</option><option>경기 수원시</option><option>경기 고양시</option><option>경기 용인시</option><option>경기 화성시</option>
-          <option>인천 연수구</option><option>인천 남동구</option><option>인천 부평구</option>
-          <option>부산 해운대구</option><option>부산 수영구</option><option>부산 부산진구</option>
-          <option>대구 수성구</option><option>대구 달서구</option>
-          <option>대전 유성구</option><option>광주 서구</option><option>울산 남구</option>
-          <option>세종 세종시</option>
-          <option>강원 춘천시</option><option>강원 원주시</option>
-          <option>충북 청주시</option><option>충남 천안시</option>
-          <option>전북 전주시</option><option>전남 순천시</option>
-          <option>경북 포항시</option><option>경남 창원시</option>
-          <option>제주 제주시</option>
+        <label class="label" for="regionProvinceSelect">지역 (시/도)</label>
+        <select id="regionProvinceSelect" class="input">
+          <option value="">시/도를 선택하세요</option>
         </select>
-        <div class="small">시도/군구까지만 선택합니다.</div>
+
+        <label class="label" for="regionDistrictSelect">지역 (군/구/시)</label>
+        <select id="regionDistrictSelect" class="input">
+          <option value="">군/구/시를 선택하세요</option>
+        </select>
+        <div class="small">시/도 먼저 선택한 뒤 군/구/시를 선택합니다.</div>
 
         <label class="label" for="passwordInput">비밀번호</label>
         <input id="passwordInput" class="input" type="password" maxlength="20" value="" placeholder="4자 이상">

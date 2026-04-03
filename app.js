@@ -79,6 +79,25 @@ const seedComments = [
 
 const defaultQuestions = [];
 
+const REGION_OPTIONS = {
+  "서울": ["강남구", "서초구", "송파구", "마포구", "성동구"],
+  "경기": ["성남시", "수원시", "고양시", "용인시", "화성시"],
+  "인천": ["연수구", "남동구", "부평구"],
+  "부산": ["해운대구", "수영구", "부산진구"],
+  "대구": ["수성구", "달서구"],
+  "대전": ["유성구"],
+  "광주": ["서구"],
+  "울산": ["남구"],
+  "세종": ["세종시"],
+  "강원": ["춘천시", "원주시"],
+  "충북": ["청주시"],
+  "충남": ["천안시"],
+  "전북": ["전주시"],
+  "전남": ["순천시"],
+  "경북": ["포항시"],
+  "경남": ["창원시"],
+  "제주": ["제주시"]
+};
 
 let currentProfile = null;
 let questions = [];
@@ -105,7 +124,8 @@ const nicknameInput = document.getElementById("nicknameInput");
 const genderSelect = document.getElementById("genderSelect");
 const ageInput = document.getElementById("ageInput");
 const mbtiSelect = document.getElementById("mbtiSelect");
-const regionSelect = document.getElementById("regionSelect");
+const regionProvinceSelect = document.getElementById("regionProvinceSelect");
+const regionDistrictSelect = document.getElementById("regionDistrictSelect");
 const passwordInput = document.getElementById("passwordInput");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 const profileMessage = document.getElementById("profileMessage");
@@ -185,6 +205,48 @@ function resetFileInput(el){
   el.value = "";
   el.type = "";
   el.type = "file";
+}
+
+function populateRegionProvinceOptions(){
+  if(!regionProvinceSelect) return;
+  regionProvinceSelect.innerHTML = '<option value="">시/도를 선택하세요</option>';
+  Object.keys(REGION_OPTIONS).forEach(province => {
+    const option = document.createElement("option");
+    option.value = province;
+    option.textContent = province;
+    regionProvinceSelect.appendChild(option);
+  });
+}
+
+function populateRegionDistrictOptions(province, selectedDistrict = ""){
+  if(!regionDistrictSelect) return;
+  regionDistrictSelect.innerHTML = '<option value="">군/구/시를 선택하세요</option>';
+  if(!province || !REGION_OPTIONS[province]) return;
+  REGION_OPTIONS[province].forEach(district => {
+    const option = document.createElement("option");
+    option.value = district;
+    option.textContent = district;
+    regionDistrictSelect.appendChild(option);
+  });
+  if(selectedDistrict) regionDistrictSelect.value = selectedDistrict;
+}
+
+function setRegionSelectorsFromValue(regionValue){
+  if(!regionProvinceSelect || !regionDistrictSelect) return;
+  if(!regionValue){
+    regionProvinceSelect.value = "";
+    populateRegionDistrictOptions("");
+    return;
+  }
+  const [province, district] = regionValue.split(" ");
+  regionProvinceSelect.value = province || "";
+  populateRegionDistrictOptions(province || "", district || "");
+}
+
+function getSelectedRegion(){
+  const province = regionProvinceSelect ? regionProvinceSelect.value : "";
+  const district = regionDistrictSelect ? regionDistrictSelect.value : "";
+  return province && district ? `${province} ${district}` : "";
 }
 
 function resetAskForm(){
@@ -318,7 +380,8 @@ function boot(){
   ageInput.value = currentProfile.age || "";
   passwordInput.value = currentProfile.password || "";
   if(mbtiSelect) mbtiSelect.value = currentProfile.mbti || "";
-  if(regionSelect) regionSelect.value = currentProfile.region || "";
+  populateRegionProvinceOptions();
+  setRegionSelectorsFromValue(currentProfile.region || "");
 
   openSplash();
 }
@@ -1635,6 +1698,12 @@ function enableSwipe(cardEl, onSwipe){
   cardEl.addEventListener("touchend", end);
 }
 
+if(regionProvinceSelect){
+  regionProvinceSelect.addEventListener("change", () => {
+    populateRegionDistrictOptions(regionProvinceSelect.value);
+  });
+}
+
 saveProfileBtn.addEventListener("click", () => {
   if(consentCheck && !consentCheck.checked){
     profileMessage.className = "error";
@@ -1645,7 +1714,7 @@ saveProfileBtn.addEventListener("click", () => {
   const gender = genderSelect.value;
   const age = parseInt(ageInput.value, 10);
   const mbti = mbtiSelect ? mbtiSelect.value : "";
-  const region = regionSelect ? regionSelect.value : "";
+  const region = getSelectedRegion();
   const pw = passwordInput.value.trim();
   const err = validateProfile(nick, pw, age, region);
   profileMessage.className = "error";
