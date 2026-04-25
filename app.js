@@ -77,7 +77,62 @@ const seedComments = [
   "이거 탐난다","사진보다 더 예쁠 듯","나도 위시리스트에 넣음","베이직해서 오래 쓸듯","살까 말까 무한반복"
 ];
 
-const defaultQuestions = [];
+const defaultQuestions = [
+  {
+    id: "default_1",
+    q: "이 가방 살까 말까?",
+    type: "single",
+    image: itemSvg("샤넬 블랙 퀼팅백"),
+    a1: "사라", a2: "마라",
+    v1: 18, v2: 7,
+    author: "패션피플", authorAge: "28", authorGender: "여", authorMbti: "ENFP",
+    createdAt: Date.now() - 1000 * 60 * 60 * 3
+  },
+  {
+    id: "default_2",
+    q: "롤렉스 vs 파텍필립 어느쪽?",
+    type: "compare",
+    image: compareSvg("롤렉스 서브마리너"),
+    image2: compareSvg("파텍필립 노틸러스"),
+    label1: "롤렉스", label2: "파텍필립",
+    a1: "롤렉스", a2: "파텍필립",
+    v1: 23, v2: 31,
+    author: "시계덕후", authorAge: "35", authorGender: "남", authorMbti: "INTJ",
+    createdAt: Date.now() - 1000 * 60 * 60 * 6
+  },
+  {
+    id: "default_3",
+    q: "이 신발 질러도 될까요?",
+    type: "single",
+    image: itemSvg("뉴발란스 990v6"),
+    a1: "사라", a2: "마라",
+    v1: 41, v2: 12,
+    author: "스니커헤드", authorAge: "24", authorGender: "남", authorMbti: "ESTP",
+    createdAt: Date.now() - 1000 * 60 * 60 * 12
+  },
+  {
+    id: "default_4",
+    q: "BMW X5 vs 벤츠 GLE 뭐가 나아?",
+    type: "compare",
+    image: compareSvg("BMW X5"),
+    image2: compareSvg("벤츠 GLE"),
+    label1: "BMW X5", label2: "벤츠 GLE",
+    a1: "BMW X5", a2: "벤츠 GLE",
+    v1: 55, v2: 48,
+    author: "드라이버", authorAge: "38", authorGender: "남", authorMbti: "ENTJ",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24
+  },
+  {
+    id: "default_5",
+    q: "이 코트 겨울에 입기 어떨까요?",
+    type: "single",
+    image: itemSvg("막스마라 캐멀 코트"),
+    a1: "사라", a2: "마라",
+    v1: 67, v2: 9,
+    author: "옷장폭발", authorAge: "30", authorGender: "여", authorMbti: "ISFJ",
+    createdAt: Date.now() - 1000 * 60 * 60 * 36
+  }
+];
 
 let currentProfile = null;
 let questions = [];
