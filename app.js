@@ -274,11 +274,13 @@ function initData(){
   });
   session.sort = "latest";
 
+  const forceReset = new URLSearchParams(location.search).get('reset') === '1';
   const clearedOnce = loadLocal(STORAGE_KEYS.cleared, false);
-  if(!clearedOnce){
+  if(!clearedOnce || forceReset){
     questions = [...defaultQuestions];
     saveLocal(STORAGE_KEYS.questions, questions);
     saveLocal(STORAGE_KEYS.cleared, true);
+    saveLocal(STORAGE_KEYS.shuffled, false);
   }
 
   const shuffledOnce = loadLocal(STORAGE_KEYS.shuffled, false);
